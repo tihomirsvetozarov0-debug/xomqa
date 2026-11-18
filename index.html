@@ -8,7 +8,7 @@
 <html lang="ru">
 <head><meta name="xomqa-signature" content="xk-9d3f-a17c-71c3">
 <meta name="xomqa-build" content="XOMQA-build-2026-11-18-karatpulse">
-<meta name="xomqa-version" content="overlay-fix-2">
+<meta name="xomqa-version" content="subgate-2">
 
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
@@ -272,6 +272,16 @@
   <button class="btn" onclick="uiMatchmake()">🎲 Игра между участниками (без стримера)</button>
 </div>
 
+<!-- Гейт подписки -->
+<div id="screenSubGate" class="screen" style="display:none">
+  <h2>💜 Очередь — для подписчиков</h2>
+  <p>Лобби стримера и запись к нему доступны подписчикам канала <b>karatpulse_x</b>.</p>
+  <p>Подпишитесь на <a href="https://www.twitch.tv/karatpulse_x" target="_blank" rel="noopener" style="color:#a970ff">twitch.tv/karatpulse_x</a>, затем возвращайтесь сюда.</p>
+  <button class="btn" onclick="subGatePass()">✅ Я подписался — продолжить</button>
+  <br>
+  <button class="back-btn" onclick="subGateBack()">← Назад</button>
+</div>
+
 <!-- Ввод ника -->
 <div id="screenNick" class="screen" style="display:none">
   <h2 id="nickTitle"></h2>
@@ -527,7 +537,7 @@ function onTap(el, fn){
 
 function hideAll(){
   stopQuizTimer();
-  ['screenIntro','screenStart','screenNick','screenWait','screenMode','screenDuel','screenGame','screenQueue','screenQGuest','screenMM','final']
+  ['screenIntro','screenStart','screenSubGate','screenNick','screenWait','screenMode','screenDuel','screenGame','screenQueue','screenQGuest','screenMM','final']
     .forEach(i => { const el = $(i); if(el) el.style.display = 'none'; });
 }
 
@@ -1834,7 +1844,30 @@ function attachRoom(c, p, waitMsg){
 }
 
 // ---------- ЛОББИ ВЕДУЩЕГО ----------
+// ---------- Гейт подписки ----------
+let subGateTarget = null;
+function showSubGate(target){
+  subGateTarget = target;
+  hideAll();
+  $('screenSubGate').style.display = 'block';
+}
+function subGatePass(){
+  const t = subGateTarget;
+  subGateTarget = null;
+  if(t === 'host') uiQueueHostReal();
+  else if(t === 'guest') uiQueueGuestReal();
+}
+function subGateBack(){
+  subGateTarget = null;
+  returnToIntro();
+}
 function uiQueueHost(){
+  showSubGate('host');
+}
+function uiQueueGuest(){
+  showSubGate('guest');
+}
+function uiQueueHostReal(){
   if(!online){
     showPopup('⚠️', 'Онлайн-режим недоступен: не удалось подключиться к Firebase.\n\nПроверьте интернет и обновите страницу (Ctrl+F5).');
     return;
@@ -1904,7 +1937,7 @@ function leaveQueueHost(){
 }
 
 // ---------- ЗРИТЕЛЬ К СТРИМЕРУ ----------
-function uiQueueGuest(){
+function uiQueueGuestReal(){
   if(!online){
     showPopup('⚠️', 'Онлайн-режим недоступен: не удалось подключиться к Firebase.\n\nПроверьте интернет и обновите страницу (Ctrl+F5).');
     return;
