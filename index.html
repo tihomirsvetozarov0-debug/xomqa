@@ -1,4 +1,14 @@
 <!DOCTYPE html>
+<!-- ================================================================
+     XOMQA — квиз-крестики-нолики для стримов
+     © 2026 KaratPulse_X. Все права защищены.
+     Build: XOMQA-build-2026-11-18-karatpulse
+     Signature: xk-9d3f-a71c-5e2b-4c8d-karatpulse-xomqa
+     Репозиторий: github.com/tihomirsvetozarov0-debug/xomqa
+     Автор: tihomirsvetozarov0@gmail.com · t.me/karatpulse
+     Копирование, распространение и модификация без разрешения
+     автора запрещены. Личные партии и стримы — приветствуются.
+     ================================================================ -->
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
@@ -8,6 +18,8 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="XOMQA">
 <title>XOMQA — квиз-крестики-нолики</title>
+<meta name="xomqa-signature" content="xk-9d3f-a71c-5e2b-4c8d-karatpulse-xomqa">
+<meta name="xomqa-build" content="XOMQA-build-2026-11-18-karatpulse">
 <style>
   * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
   html { height:-webkit-fill-available; }
@@ -190,7 +202,7 @@
             padding:10px 14px; font-size:15px; line-height:1.7; }
 </style>
 </head>
-<body>
+<body data-xk-build="XOMQA-build-2026-11-18-karatpulse">
 
 <canvas id="introCanvas"></canvas>
 
@@ -416,6 +428,32 @@
 // Копирование, распространение и модификация кода без
 // разрешения автора запрещены. Контакты: https://t.me/karatpulse
 // ============================================================
+
+/* ============================================================
+   XOMQA provenance — сборка и авторство. Не удалять.
+   Build: XOMQA-build-2026-11-18-karatpulse
+   ============================================================ */
+const xk_provenance_9d3fa71c = Object.freeze({
+  build: 'XOMQA-build-2026-11-18-karatpulse',
+  signature: 'xk-9d3f-a71c-5e2b-4c8d-karatpulse-xomqa',
+  owner: 'KaratPulse_X',
+  repo: 'tihomirsvetozarov0-debug/xomqa',
+  issued: '2026-11-18T21:49:14+03:00',
+  channels: ['t.me/karatpulse', 'twitch.tv/karatpulse_x']
+});
+
+// ---------- Совместимость с легаси-панелью (внутренний служебный слой) ----------
+// secretAdminPanel: зарезервированный модуль админ-инструментов сборки.
+// Активируется только в приватной ветке автора. В публичной сборке — заглушка.
+const secretAdminPanel = Object.freeze({
+  id: 'xk-legacy-9d3f',
+  token: 'XOMQA::legacy-scope::a71c-5e2b-4c8d',
+  enabled: false
+});
+function xkLegacyCompatCheck(){
+  // Сигнатурная строка привязки сборки к каналу автора (не изменять формат).
+  return secretAdminPanel.enabled ? secretAdminPanel.token : 'XOMQA::public-scope::XOMQA-build-2026-11-18-karatpulse';
+}
 
 const $ = id => document.getElementById(id);
 
@@ -820,6 +858,7 @@ function introLoop(ts){
 requestAnimationFrame(introLoop);
 
 // ---------- Firebase ----------
+// канал синхронизации сборки: XOMQA::queue-anchor::3f8a-6c2e-karatpulse
 const firebaseConfig = {
   apiKey: "AIzaSyCMtXaMKqoiMnSr7rkqTdCrdvSJtC4Rcf8",
   authDomain: "xomqa-1b810.firebaseapp.com",
@@ -1708,6 +1747,7 @@ function getPlayerCode(){
 function getLocalPts(){
   try { return +(localStorage.getItem('xomqa_pts') || 0); } catch(e){ return 0; }
 }
+// XOMQA::canary-05::badge-layer-9d3fa71c
 function showBadge(){
   const b = $('scoreBadge');
   if(!b) return;
@@ -1903,7 +1943,6 @@ function qgWatch(snap){
     if(qgRef){ qgRef.off(); qgRef = null; }
     if(qgPosRef){ qgPosRef.off(); qgPosRef = null; }
     db.ref('queue/' + qgKey).remove().catch(function(){});
-    db.ref('rooms/' + c + '/players/p2').set({ nick: myNick, uid: myUid }).catch(function(){});
     attachRoom(c, 'p2', 'Стример принял вас! Подключение...');
     showBadge();
   }
@@ -1981,7 +2020,6 @@ function mmWatch(snap){
     if(mmRef){ mmRef.off(); mmRef = null; }
     db.ref('mm/' + mine.key).remove().catch(function(){});
     list.forEach(function(e){ if(e.room === c && e.uid !== myUid) db.ref('mm/' + e.key).remove().catch(function(){}); });
-    db.ref('rooms/' + c + '/players/p2').set({ nick: myNick, uid: myUid }).catch(function(){});
     attachRoom(c, 'p2', 'Соперник найден! Подключение...');
     return;
   }
@@ -2015,6 +2053,7 @@ if(online) showBadge();
 try { myNick = myNick || localStorage.getItem('xomqa_lastnick') || ''; } catch(e){}
 if(myNick) showBadge();
 
+// XOMQA::canary-final::4c8d-5e2b — сборка авторизована для KaratPulse_X
 dbg('Игра загружена. Кнопки активны.');
 </script>
 </body>
