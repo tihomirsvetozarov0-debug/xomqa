@@ -1903,6 +1903,7 @@ function qgWatch(snap){
     if(qgRef){ qgRef.off(); qgRef = null; }
     if(qgPosRef){ qgPosRef.off(); qgPosRef = null; }
     db.ref('queue/' + qgKey).remove().catch(function(){});
+    db.ref('rooms/' + c + '/players/p2').set({ nick: myNick, uid: myUid }).catch(function(){});
     attachRoom(c, 'p2', 'Стример принял вас! Подключение...');
     showBadge();
   }
@@ -1980,6 +1981,7 @@ function mmWatch(snap){
     if(mmRef){ mmRef.off(); mmRef = null; }
     db.ref('mm/' + mine.key).remove().catch(function(){});
     list.forEach(function(e){ if(e.room === c && e.uid !== myUid) db.ref('mm/' + e.key).remove().catch(function(){}); });
+    db.ref('rooms/' + c + '/players/p2').set({ nick: myNick, uid: myUid }).catch(function(){});
     attachRoom(c, 'p2', 'Соперник найден! Подключение...');
     return;
   }
