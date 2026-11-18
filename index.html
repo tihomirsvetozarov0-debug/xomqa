@@ -1,0 +1,2019 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="theme-color" content="#0e0a1a">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="XOMQA">
+<title>XOMQA — квиз-крестики-нолики</title>
+<style>
+  * { box-sizing:border-box; -webkit-tap-highlight-color:transparent; }
+  html { height:-webkit-fill-available; }
+  html,body { margin:0; padding:0; }
+  body { font-family:Arial, sans-serif; background:#0e0a1a; color:#fff;
+         display:flex; flex-direction:column; align-items:center;
+         min-height:100vh; min-height:-webkit-fill-available;
+         padding:16px; touch-action:manipulation; }
+  @supports (padding:max(0px)) {
+    body { padding-top:max(16px, env(safe-area-inset-top));
+           padding-bottom:max(16px, env(safe-area-inset-bottom));
+           padding-left:max(16px, env(safe-area-inset-left));
+           padding-right:max(16px, env(safe-area-inset-right)); }
+  }
+  h1 { color:#a970ff; margin:8px 0; }
+  h2,h3 { color:#a970ff; }
+  .screen { text-align:center; }
+  button, input { touch-action:manipulation; font-family:inherit; -webkit-appearance:none; }
+  button { cursor:pointer; }
+  * { -webkit-user-select:none; user-select:none; -webkit-touch-callout:none; }
+  input { -webkit-user-select:auto; user-select:auto; }
+
+  #introCanvas { position:fixed; inset:0; z-index:0; pointer-events:none; }
+  #screenIntro { position:relative; z-index:2;
+    display:flex; flex-direction:column; justify-content:center; align-items:center; flex:1; width:100%; }
+
+  .intro-logo { font-size:clamp(48px,12vw,110px); font-weight:900; letter-spacing:14px; color:#a970ff; }
+  .intro-logo b { display:inline-block; animation:glowWave 2.4s ease-in-out infinite; }
+  .intro-logo b:nth-child(1){animation-delay:0s} .intro-logo b:nth-child(2){animation-delay:.2s}
+  .intro-logo b:nth-child(3){animation-delay:.4s} .intro-logo b:nth-child(4){animation-delay:.6s}
+  .intro-logo b:nth-child(5){animation-delay:.8s}
+  .intro-logo .x { color:#ff4d6d; animation-name:glowWaveX; }
+  .intro-logo .o { color:#4dd2ff; animation-name:glowWaveO; }
+  @keyframes glowWave { 0%,100%{transform:scale(1);text-shadow:0 0 12px rgba(169,112,255,.4)}
+    50%{transform:scale(1.07);text-shadow:0 0 35px rgba(169,112,255,.95),0 0 70px rgba(169,112,255,.45)} }
+  @keyframes glowWaveX { 0%,100%{transform:scale(1);text-shadow:0 0 12px rgba(255,77,109,.4)}
+    50%{transform:scale(1.07);text-shadow:0 0 35px rgba(255,77,109,.95),0 0 70px rgba(255,77,109,.45)} }
+  @keyframes glowWaveO { 0%,100%{transform:scale(1);text-shadow:0 0 12px rgba(77,210,255,.4)}
+    50%{transform:scale(1.07);text-shadow:0 0 35px rgba(77,210,255,.95),0 0 70px rgba(255,77,109,.45)} }
+
+  .intro-sub { margin-top:14px; color:#b9a5e0; font-size:18px; opacity:0; animation:fadeUp .8s ease-out 1.1s forwards; }
+  .intro-sub small { display:block; margin-top:6px; color:#7f6fa8; font-size:13px; }
+  @keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+  .intro-actions { display:flex; align-items:center; justify-content:center; gap:14px; margin-top:34px; }
+  .intro-btn { padding:14px 44px; font-size:18px; background:linear-gradient(135deg,#a970ff,#6b3fa8); color:#fff;
+               border:none; border-radius:12px; opacity:0; animation:fadeUp .8s ease-out 1.6s forwards;
+               box-shadow:0 0 20px rgba(169,112,255,.35); }
+  .intro-decor { margin-top:26px; font-size:34px; letter-spacing:18px; color:#4d2a7d;
+                 opacity:0; animation:fadeUp .8s ease-out 1.9s forwards; }
+  .intro-decor span { display:inline-block; animation:pulse 1.6s ease-in-out infinite; }
+  .intro-decor span:nth-child(2){animation-delay:.4s} .intro-decor span:nth-child(3){animation-delay:.8s}
+  @keyframes pulse { 0%,100%{transform:scale(1);opacity:.7} 50%{transform:scale(1.25);opacity:1} }
+
+  .intro-copy { margin-top:24px; color:#7f6fa8; font-size:13px; opacity:0; animation:fadeUp .8s ease-out 2.2s forwards; }
+  .intro-copy a { color:#4dd2ff; text-decoration:none; border-bottom:1px dashed #4dd2ff; }
+
+  #bgfun { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; display:none; }
+  #bgfun span { position:absolute; bottom:-70px; font-size:34px; opacity:.55; animation:floatUp linear infinite; }
+  #bgfun span:nth-child(1){left:6%;animation-duration:11s}
+  #bgfun span:nth-child(2){left:22%;animation-duration:14s;animation-delay:2s;font-size:26px}
+  #bgfun span:nth-child(3){left:40%;animation-duration:9s;animation-delay:4s}
+  #bgfun span:nth-child(4){left:58%;animation-duration:13s;animation-delay:1s;font-size:28px}
+  #bgfun span:nth-child(5){left:74%;animation-duration:10s;animation-delay:3s}
+  #bgfun span:nth-child(6){left:88%;animation-duration:15s;animation-delay:5s;font-size:24px}
+  #bgfun span:nth-child(7){left:14%;animation-duration:12s;animation-delay:6s}
+  #bgfun span:nth-child(8){left:66%;animation-duration:10.5s;animation-delay:7.5s;font-size:30px}
+  @keyframes floatUp { from{transform:translateY(0) rotate(-8deg)} to{transform:translateY(-110vh) rotate(8deg)} }
+
+  #soundBtn { width:56px; height:56px; font-size:22px; background:#2d1b4e; color:#fff;
+              border:2px solid #a970ff; border-radius:50%; }
+  body > #soundBtn { position:fixed; top:12px; right:12px; z-index:300;
+    top:max(12px, env(safe-area-inset-top)); right:max(12px, env(safe-area-inset-right)); }
+  #soundBtn:hover { background:#4d2a7d; }
+
+  #board { display:grid; gap:8px; margin:14px auto; padding:10px; position:relative;
+           border-radius:18px; background:#0e0a1a; max-width:calc(100% - 20px); }
+  #board::before, #board::after { content:''; position:absolute; inset:0; border-radius:18px; padding:2px;
+    background:linear-gradient(90deg,#ff4d6d,#a970ff,#4dd2ff,#ff4d6d); background-size:300% 100%;
+    -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; pointer-events:none; }
+  #board::before { animation:flowA 5s linear infinite; }
+  #board::after { background:linear-gradient(-90deg,#ff4d6d,#4dd2ff,#a970ff,#ff4d6d); background-size:300% 100%;
+    filter:blur(5px); opacity:.85; animation:flowB 5s linear infinite; }
+  @keyframes flowA { from{background-position:0% 0} to{background-position:300% 0} }
+  @keyframes flowB { from{background-position:300% 0} to{background-position:0% 0} }
+
+  .cell { position:relative; overflow:hidden; border-radius:12px; cursor:pointer; user-select:none;
+          -webkit-user-select:none; padding:3px; background:#2d1b4e; }
+  .cell::before, .cell::after { content:''; position:absolute; inset:0; border-radius:12px; padding:2px;
+    background:conic-gradient(from 0deg,transparent 0deg 240deg,#ff4d6d 270deg,#a970ff 300deg,#4dd2ff 330deg,transparent 360deg);
+    -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+    -webkit-mask-composite:xor; mask-composite:exclude; }
+  .cell::before { animation:neonRun 3.2s linear infinite; }
+  .cell::after { background:conic-gradient(from 180deg,transparent 0deg 240deg,#4dd2ff 270deg,#39ffb0 300deg,#ff4d6d 330deg,transparent 360deg);
+    filter:blur(4px); opacity:.9; animation:neonRun 3.2s linear infinite reverse; }
+  .cell:nth-child(2n)::before,.cell:nth-child(2n)::after{animation-duration:4s}
+  .cell:nth-child(3n)::before,.cell:nth-child(3n)::after{animation-duration:5s}
+  .cell:nth-child(5n)::before,.cell:nth-child(5n)::after{animation-duration:6.5s}
+  @keyframes neonRun { from{transform:rotate(0)} to{transform:rotate(360deg)} }
+
+  .cellface { position:relative; z-index:1; display:flex; align-items:center; justify-content:center;
+    border-radius:9px; font-weight:bold; background:linear-gradient(135deg,#241640,#4d2a7d,#2d1b4e,#3b1f66);
+    background-size:300% 300%; animation:shimmerFace 5s ease-in-out infinite; }
+  .cell:nth-child(2n) .cellface{animation-duration:6s;animation-delay:.8s}
+  .cell:nth-child(3n) .cellface{animation-duration:7s;animation-delay:1.6s}
+  @keyframes shimmerFace { 0%,100%{background-position:0% 0} 50%{background-position:100% 100%} }
+  .cell:hover .cellface { filter:brightness(1.35); }
+  .cell.used { cursor:default; }
+  .cellface.x { color:#ff4d6d; } .cellface.o { color:#4dd2ff; }
+  .cell.win .cellface { background:linear-gradient(135deg,#a970ff,#ff8fd0,#a970ff,#6b3fa8);
+    background-size:300% 300%; animation-duration:2.5s; }
+  .cellface.bomb { background:linear-gradient(135deg,#7a1020,#b02040,#7a1020)!important; }
+
+  #boom { position:fixed; inset:0; z-index:240; display:none; pointer-events:none;
+    background:radial-gradient(circle at 50% 45%,rgba(255,220,80,.95) 0%,rgba(255,110,40,.75) 30%,rgba(120,10,10,.55) 60%,transparent 85%); }
+  @keyframes boomFlash { from{opacity:1} to{opacity:0} }
+  body.shake { animation:bodyShake .5s linear; }
+  @keyframes bodyShake { 0%,100%{transform:translate(0,0)} 15%{transform:translate(-8px,4px)}
+    30%{transform:translate(7px,-5px)} 45%{transform:translate(-6px,-3px)} 60%{transform:translate(5px,4px)}
+    75%{transform:translate(-3px,2px)} 90%{transform:translate(2px,-2px)} }
+
+  .modes { display:flex; flex-direction:column; gap:10px; margin-top:16px; max-width:560px; }
+  .mode-btn { padding:12px 24px; background:#2d1b4e; color:#fff; border:2px solid #4d2a7d;
+              border-radius:10px; font-size:16px; text-align:left; }
+  .mode-btn:hover { background:#4d2a7d; border-color:#a970ff; }
+  .mode-btn small { display:block; color:#b9a5e0; font-size:12px; margin-top:4px; line-height:1.35; }
+  .mode-btn .danger { color:#ff8f9e; }
+  input { padding:10px; text-align:center; border-radius:8px; border:2px solid #a970ff;
+          background:#1a1028; color:#fff; font-size:16px; max-width:90vw; }
+  #hud { display:flex; gap:24px; align-items:center; margin:10px 0; font-size:16px; flex-wrap:wrap; justify-content:center; }
+  #timer { font-size:22px; color:#a970ff; font-weight:bold; }
+  .p1 { color:#ff4d6d; } .p2 { color:#4dd2ff; }
+  .box { background:#2d1b4e; padding:20px; border-radius:12px; width:400px; max-width:95vw;
+         text-align:center; margin:16px auto 0; position:relative; z-index:2; }
+  .answer { display:block; margin:8px auto; padding:10px 18px; background:#4d2a7d; color:#fff;
+            border:none; border-radius:8px; font-size:15px; width:90%; }
+  .answer:hover { background:#6b3fa8; }
+  .btn { margin-top:12px; padding:10px 24px; background:#a970ff; color:#fff; border:none;
+         border-radius:8px; font-size:16px; }
+  .btn:hover { background:#c08fff; }
+  #flash { min-height:26px; margin-top:8px; font-size:15px; }
+  .err { color:#ff4d6d; margin-top:10px; min-height:20px; }
+  .code { font-size:36px; letter-spacing:10px; color:#a970ff; font-weight:bold; }
+  .danger { color:#ff8f9e; }
+  .back-btn { margin-top:14px; padding:8px 18px; background:#3b2a5e; color:#b9a5e0;
+              border:2px solid #4d2a7d; border-radius:8px; font-size:14px; }
+  .exit-btn { margin-top:10px; padding:8px 20px; background:#5a1a2a; color:#ff8f9e;
+              border:2px solid #ff4d6d; border-radius:8px; font-size:14px; }
+  .link-btn { margin-top:12px; padding:10px 18px; background:#2d1b4e; color:#4dd2ff;
+              border:2px solid #4dd2ff; border-radius:8px; font-size:14px; }
+
+  #qtimerBox { margin:8px 0 4px; }
+  #qtimerTrack { height:10px; background:#1a1028; border-radius:6px; overflow:hidden; border:1px solid #4d2a7d; }
+  #qtimerBar { height:100%; width:100%; background:#39ffb0; border-radius:6px; }
+  #qtimerSec { margin-top:4px; font-size:14px; color:#b9a5e0; }
+
+  #popup, #termsPopup { position:fixed; inset:0; background:rgba(10,6,20,.8); z-index:250;
+           display:none; justify-content:center; align-items:center; padding:16px; }
+  #termsPopup { z-index:400; }
+  .pbox { background:#2d1b4e; border:2px solid #a970ff; border-radius:16px; padding:28px 36px;
+          text-align:center; max-width:520px; max-height:90vh; overflow-y:auto;
+          -webkit-overflow-scrolling:touch;
+          animation:popIn .3s ease-out; box-shadow:0 0 40px rgba(169,112,255,.5); }
+  @keyframes popIn { from{transform:scale(.6);opacity:0} to{transform:scale(1);opacity:1} }
+  #popIcon { font-size:56px; margin-bottom:8px; }
+  #popText { font-size:19px; line-height:1.4; white-space:pre-line; }
+  #finalText { white-space:pre-line; }
+
+  #dbgBox { position:fixed; bottom:0; left:0; right:0; background:rgba(0,0,0,.85); color:#0f0;
+            font-size:11px; padding:6px; padding-bottom:max(6px, env(safe-area-inset-bottom));
+            max-height:90px; overflow:auto; z-index:9999;
+            font-family:monospace; white-space:pre-wrap; display:none; }
+  #dbgTab { position:fixed; bottom:8px; right:8px; z-index:10000; background:rgba(0,0,0,.7);
+            color:#0f0; font-size:11px; padding:6px 10px; border-radius:14px;
+            font-family:monospace; cursor:pointer; user-select:none; }
+  #scoreBadge { position:fixed; bottom:8px; left:8px; z-index:10000; background:rgba(0,0,0,.7);
+            color:#fff; font-size:11px; padding:6px 10px; border-radius:14px; display:none; }
+  #queueList { text-align:left; max-height:38vh; overflow:auto; margin:10px auto;
+            width:min(90%, 420px); background:rgba(255,255,255,.06); border-radius:10px;
+            padding:10px 14px; font-size:15px; line-height:1.7; }
+</style>
+</head>
+<body>
+
+<canvas id="introCanvas"></canvas>
+
+<div id="bgfun">
+  <span>😄</span><span>🎉</span><span>🚀</span><span>🤪</span>
+  <span>⭐</span><span>🍕</span><span>🌈</span><span>💜</span>
+</div>
+
+<!-- ИНТРО -->
+<div id="screenIntro" class="screen">
+  <div class="intro-logo"><b class="x">X</b><b>O</b><b>M</b><b>Q</b><b class="o">A</b></div>
+  <div class="intro-sub">Квиз-крестики-нолики для стримов
+    <small>дуэль чисел · вопросы · фигуры на поле</small>
+  </div>
+  <div class="intro-actions" id="introActions">
+    <button class="intro-btn" id="btnIntro" onclick="uiEnter()">Начать</button>
+    <button id="soundBtn" onclick="toggleMusic()" title="Звук вкл/выкл">🔇</button>
+  </div>
+  <div class="intro-decor"><span>❌</span><span>♦</span><span>⭕</span></div>
+  <div class="intro-copy">
+    © 2026 KaratPulse_X · Все права защищены ·
+    <a href="https://www.twitch.tv/karatpulse_x" target="_blank" rel="noopener">Мой канал</a> ·
+    <a href="LICENSE.txt" target="_blank" rel="noopener">Лицензия</a> ·
+    <a href="PRIVACY.txt" target="_blank" rel="noopener">Конфиденциальность</a>
+  </div>
+</div>
+
+<!-- Стартовый экран -->
+<div id="screenStart" class="screen" style="display:none">
+  <h1>XOMQA</h1>
+  <h2>Выберите способ игры</h2>
+  <button class="btn" onclick="uiCreate()">Создать игру (онлайн)</button>
+  <br>
+  <button class="btn" onclick="uiJoin()">Присоединиться к игре (онлайн)</button>
+  <button class="btn" onclick="uiQueueHost()">🎬 Ведущий — открыть лобби очереди</button>
+  <button class="btn" onclick="uiQueueGuest()">🙋 Зритель — записаться к стримеру</button>
+  <button class="btn" onclick="uiMatchmake()">🎲 Игра между участниками (без стримера)</button>
+</div>
+
+<!-- Ввод ника -->
+<div id="screenNick" class="screen" style="display:none">
+  <h2 id="nickTitle"></h2>
+  <div id="codeJoinBox" style="display:none">
+    <p>Код комнаты, который прислал друг:</p>
+    <input id="joinCode" maxlength="4" placeholder="ABCD" style="width:130px; font-size:22px; letter-spacing:6px;">
+  </div>
+  <p>Ваш никнейм из Twitch:</p>
+  <input id="nickInput" maxlength="20" placeholder="Никнейм в Twitch">
+
+  <div class="err" id="nickErr"></div>
+  <button class="btn" id="btnNickNext">Далее</button>
+  <br>
+  <button class="back-btn" onclick="uiBackToStart()">← Назад</button>
+</div>
+
+<!-- Ожидание второго игрока -->
+<div id="screenWait" class="screen" style="display:none">
+  <h2>Ждём второго игрока</h2>
+  <p>Передайте этот код другу в Twitch:</p>
+  <div class="code" id="codeShow"></div>
+  <p id="waitMsg"></p>
+  <button class="link-btn" id="btnCopyLink">📋 Скопировать ссылку для Twitch-чата</button>
+  <br>
+  <button class="back-btn" onclick="uiBackToStart()">← Назад</button>
+</div>
+
+<!-- Выбор режима -->
+<div id="screenMode" class="screen" style="display:none">
+  <p id="modeWho"></p>
+  <div class="modes">
+    <button class="mode-btn" id="modeBtn0"><b>Лёгкий — поле 3×3</b>
+      <small>Разогрев для новичков. Поле 3×3, линия из 3 фигур, 3 попытки на ответ.
+      Простые вопросы: математика, окружающий мир — уровень 1–5 класса. Без бомб.</small></button>
+    <button class="mode-btn" id="modeBtn1"><b>Средний — поле 4×4</b>
+      <small>Быстрый баланс. Поле 4×4, линия из 4 фигур, 4 попытки.
+      Проценты, география, физика — уровень 5–7 класса. Без бомб.</small></button>
+    <button class="mode-btn" id="modeBtn2"><b>Высокий — поле 5×5</b>
+      <small>Для уверенных. Поле 5×5, линия из 4 фигур, 5 попыток.
+      Физика, химия, формула Пифагора — уровень 7–9 класса. Без бомб.</small></button>
+    <button class="mode-btn" id="modeBtn3"><b>Всезнайка — поле 6×6 <span class="danger">· 4 бомбы!</span></b>
+      <small>Экшен-режим. Поле 6×6, линия из 4 фигур, 6 ❤ (сердечки). Биология и природа.
+      4 скрытые бомбы: наступил — взрыв и поражение.</small></button>
+    <button class="mode-btn" id="modeBtn4"><b>Вундеркинг — поле 7×7 <span class="danger">· 6 бомб!</span></b>
+      <small>Хардкор. Поле 7×7, линия из 6 фигур, 3 ❤ (сердечки). Квантовая физика.
+      6 скрытых бомб превращают каждый ход в лотерею.</small></button>
+  </div>
+  <br>
+  <button class="back-btn" onclick="uiBackToStart()">← Назад</button>
+</div>
+
+<!-- Дуэль чисел -->
+<div id="screenDuel" class="screen" style="display:none">
+  <h2>Дуэль чисел</h2>
+  <div class="box">
+    <div id="duelInputBox" style="display:none">
+      <p id="duelPrompt">Введите своё число от 1 до 50:</p>
+      <input id="duelNum" type="number" min="1" max="50" inputmode="numeric" style="width:110px; font-size:20px;">
+      <br>
+      <button class="btn" id="btnDuelNum">Назвать число</button>
+      <div class="err" id="duelErr"></div>
+    </div>
+    <p id="duelWait"></p>
+    <div id="duelResult"></div>
+    <button class="btn" id="duelGo" style="display:none">К игре!</button>
+  </div>
+  <button class="back-btn" id="duelBack">← Назад</button>
+</div>
+
+<!-- Игровой экран -->
+<div id="screenGame" class="screen" style="display:none">
+  <div id="hud">
+    <span class="p1"><span id="hudNick1"></span> (X): попытки <span id="tries1"></span> · серия <span id="streak1">0</span>🔥</span>
+    <span id="timer">00:00:00</span>
+    <span class="p2"><span id="hudNick2"></span> (O): попытки <span id="tries2"></span> · серия <span id="streak2">0</span>🔥</span>
+  </div>
+  <div id="status"></div>
+  <div id="board"></div>
+  <div id="flash"></div>
+  <button class="exit-btn" id="btnExit">🚪 Выйти из игры</button>
+
+  <div id="quiz" class="box" style="display:none">
+    <p id="question"></p>
+    <div id="qtimerBox" style="display:none">
+      <div id="qtimerTrack"><div id="qtimerBar"></div></div>
+      <div id="qtimerSec">15</div>
+    </div>
+    <div id="answers"></div>
+  </div>
+</div>
+
+<!-- Финал -->
+<div id="final" class="box" style="display:none">
+  <h2 id="finalText"></h2>
+  <p id="finalTime"></p>
+  <button class="btn" onclick="newGame()">Новая игра</button>
+</div>
+
+<!-- Всплывающее окно -->
+<div id="popup">
+  <div class="pbox">
+    <div id="popIcon"></div>
+    <div id="popText"></div>
+    <div id="popBtns"></div>
+    <button class="btn" onclick="closePopup()">Ок</button>
+  </div>
+</div>
+
+<!-- Условия использования -->
+<div id="termsPopup">
+  <div class="pbox">
+    <div style="font-size:44px; margin-bottom:8px;">⚖️</div>
+    <div style="font-size:15px; line-height:1.5; text-align:left;">
+      <b>XOMQA</b> — игра © 2026 KaratPulse_X. Все права защищены.<br><br>
+      Копирование, распространение и модификация кода без разрешения автора запрещены.
+      Личные партии и стримы — приветствуются. Контакты автора:
+      <a href="https://t.me/karatpulse" target="_blank" rel="noopener"
+         style="color:#4dd2ff;">t.me/karatpulse</a> ·
+      <a href="https://www.twitch.tv/karatpulse_x" target="_blank" rel="noopener"
+         style="color:#4dd2ff;">twitch.tv/karatpulse_x</a> ·
+      <a href="mailto:tihomirsvetozarov0@gmail.com" style="color:#4dd2ff;">tihomirsvetozarov0@gmail.com</a>
+    </div>
+    <button class="btn" onclick="acceptTerms()">Понятно, играем!</button>
+  </div>
+</div>
+
+<!-- Взрыв -->
+<div id="boom"></div>
+
+<!-- Лобби ведущего (очередь зрителей) -->
+<div id="screenQueue" class="screen" style="display:none">
+  <h2>🎬 Лобби очереди</h2>
+  <p>Ваш никнейм (стример):</p>
+  <input id="hostNick" maxlength="20" placeholder="Ваш ник">
+  <p>Очередь зрителей:</p>
+  <div id="queueList"></div>
+  <button class="btn" id="btnAcceptNext" style="display:none">✅ Принять и играть</button>
+  <br>
+  <button class="back-btn" id="btnQueueBack">← Назад</button>
+</div>
+
+<!-- Очередь зрителя -->
+<div id="screenQGuest" class="screen" style="display:none">
+  <h2>🙋 Очередь к стримеру</h2>
+  <div id="qgForm">
+    <p>Ваш никнейм из Twitch:</p>
+    <input id="qgNick" maxlength="20" placeholder="Никнейм в Twitch">
+    <div class="err" id="qgErr"></div>
+    <button class="btn" id="btnQgJoin">Записаться</button>
+  </div>
+  <div id="qgStatus" style="display:none">
+    <p id="qgPlace"></p>
+    <button class="back-btn" id="btnQgLeave">Выйти из очереди</button>
+  </div>
+</div>
+
+<!-- Матчмейкинг без стримера -->
+<div id="screenMM" class="screen" style="display:none">
+  <h2>🎲 Игра между участниками</h2>
+  <div id="mmForm">
+    <p>Ваш никнейм из Twitch:</p>
+    <input id="mmNick" maxlength="20" placeholder="Никнейм в Twitch">
+    <div class="err" id="mmErr"></div>
+    <button class="btn" id="btnMmJoin">Найти соперника</button>
+  </div>
+  <div id="mmStatus" style="display:none">
+    <p id="mmPlace"></p>
+    <button class="back-btn" id="btnMmLeave">Отменить поиск</button>
+  </div>
+</div>
+
+<!-- Плашка очков -->
+<div id="scoreBadge"></div>
+
+<!-- Экран отладки -->
+<div id="dbgBox"></div>
+<div id="dbgTab">🖥 отладка</div>
+
+<!-- Firebase: загружается динамически (CDN-фолбэк) -->
+<script>
+// ============================================================
+// XOMQA — квиз-крестики-нолики для стримов
+// © 2026 KaratPulse_X. Все права защищены.
+// Копирование, распространение и модификация кода без
+// разрешения автора запрещены. Контакты: https://t.me/karatpulse
+// ============================================================
+
+const $ = id => document.getElementById(id);
+
+// ---------- Экран отладки ----------
+let dbgHidden = true, dbgNew = 0;
+function dbg(msg){
+  try {
+    const d = $('dbgBox');
+    d.textContent += msg + '\n';
+    if(dbgHidden){
+      dbgNew++;
+      const t = $('dbgTab');
+      if(t) t.textContent = '🖥 отладка · ' + dbgNew;
+    }
+  } catch(e){}
+}
+function dbgSetCollapsed(c){
+  dbgHidden = c;
+  try {
+    const d = $('dbgBox');
+    d.style.display = c ? 'none' : 'block';
+    dbgNew = 0;
+    const t = $('dbgTab');
+    if(t) t.textContent = c ? '🖥 отладка' : '🖥 отладка ×';
+  } catch(e){}
+}
+function dbgToggle(){ dbgSetCollapsed(!dbgHidden); }
+window.onerror = function(m, s, l){
+  dbg('ОШИБКА: ' + m + ' (строка ' + l + ')');
+  return false;
+};
+
+// ---------- Надёжная привязка кнопок: touchstart + click ----------
+function onTap(el, fn){
+  if(!el) return;
+  let last = 0;
+  const h = e => {
+    const now = Date.now();
+    if(now - last < 500) return;
+    last = now;
+    try { fn(); } catch(err){ dbg('Ошибка кнопки: ' + err.message); }
+  };
+  if(el.addEventListener){
+    el.addEventListener('touchstart', function(ev){
+      if(ev.cancelable) ev.preventDefault();
+      h(ev);
+    }, { passive:false });
+    el.addEventListener('click', h);
+  } else if(el.attachEvent){
+    el.attachEvent('onclick', h);
+  }
+}
+
+function hideAll(){
+  stopQuizTimer();
+  ['screenIntro','screenStart','screenNick','screenWait','screenMode','screenDuel','screenGame','screenQueue','screenQGuest','screenMM','final']
+    .forEach(i => { const el = $(i); if(el) el.style.display = 'none'; });
+}
+
+// ---------- Музыка ----------
+let AC = null, masterGain = null, noiseBuf = null;
+let musicOn = false, lastTrack = 'intro';
+let schedTimer = null, schedTime = 0, schedStep = 0, curTrack = null;
+
+function ensureAC(){
+  try {
+    if(!AC){
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if(!Ctx) return false;
+      AC = new Ctx();
+      masterGain = AC.createGain();
+      masterGain.gain.value = 0.55;
+      masterGain.connect(AC.destination);
+      noiseBuf = AC.createBuffer(1, AC.sampleRate * 0.5, AC.sampleRate);
+      const d = noiseBuf.getChannelData(0);
+      for(let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+    }
+    if(AC.state === 'suspended') AC.resume();
+    return true;
+  } catch(e){ dbg('Аудио: ' + e.message); return false; }
+}
+
+function tone(t, freq, dur, type, vol, glideTo, attack){
+  const o = AC.createOscillator(), g = AC.createGain();
+  o.type = type || 'sine';
+  o.frequency.setValueAtTime(freq, t);
+  if(glideTo) o.frequency.exponentialRampToValueAtTime(glideTo, t + dur * 0.8);
+  g.gain.setValueAtTime(0.0001, t);
+  g.gain.exponentialRampToValueAtTime(vol, t + (attack || 0.01));
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  o.connect(g); g.connect(masterGain);
+  o.start(t); o.stop(t + dur + 0.05);
+}
+
+function noiseHit(t, dur, vol, hp){
+  const s = AC.createBufferSource(); s.buffer = noiseBuf;
+  const g = AC.createGain(), f = AC.createBiquadFilter();
+  f.type = 'highpass'; f.frequency.value = hp;
+  g.gain.setValueAtTime(vol, t);
+  g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+  s.connect(f); f.connect(g); g.connect(masterGain);
+  s.start(t); s.stop(t + dur + 0.02);
+}
+
+const TRACKS = {
+  intro: {
+    bpm: 72, steps: 64,
+    step(t, s){
+      const chords = [
+        [220.00, 261.63, 329.63],
+        [174.61, 220.00, 261.63],
+        [261.63, 329.63, 392.00],
+        [196.00, 246.94, 293.66]
+      ];
+      if(s % 16 === 0){
+        const ch = chords[(s / 16) | 0];
+        ch.forEach(f => {
+          tone(t, f, 4.4, 'sawtooth', 0.035, null, 0.6);
+          tone(t, f / 2, 4.4, 'sine', 0.06, null, 0.5);
+        });
+      }
+      const bells = {0:440, 12:523.25, 26:659.25, 38:523.25, 46:587.33, 58:440};
+      if(bells[s] !== undefined) tone(t, bells[s], 1.6, 'sine', 0.12, null, 0.02);
+    }
+  },
+  game: {
+    bpm: 132, steps: 32,
+    step(t, s){
+      if(s % 4 === 0) tone(t, 150, 0.22, 'sine', 0.55, 45, 0.005);
+      if(s % 2 === 1) noiseHit(t, 0.04, 0.10, 7000);
+      if(s % 8 === 4) noiseHit(t, 0.12, 0.18, 1200);
+      const bassSeq = [110,0,110,0, 110,0,110,110, 110,0,110,0, 164.81,0,196,0,
+                        110,0,110,0, 110,0,110,110, 220,0,196,0, 164.81,0,130.81,0];
+      if(bassSeq[s]) tone(t, bassSeq[s], 0.16, 'sawtooth', 0.16, null, 0.005);
+      const leadSeq = [440,0,523.25,0, 659.25,0,587.33,0, 523.25,0,440,0, 392,0,440,0,
+                        659.25,0,783.99,0, 880,0,783.99,0, 659.25,0,523.25,0, 587.33,0,659.25,0];
+      if(leadSeq[s]) tone(t, leadSeq[s], 0.2, 'square', 0.06, null, 0.01);
+    }
+  }
+};
+
+function startMusic(name){
+  if(!ensureAC()) return;
+  stopMusic();
+  lastTrack = name;
+  curTrack = TRACKS[name];
+  schedStep = 0;
+  schedTime = AC.currentTime + 0.1;
+  schedTimer = setInterval(schedulerTick, 60);
+  musicOn = true;
+  $('soundBtn').textContent = '🔊';
+}
+
+function schedulerTick(){
+  if(!curTrack || !AC) return;
+  const stepDur = 60 / curTrack.bpm / 4;
+  while(schedTime < AC.currentTime + 0.25){
+    curTrack.step(schedTime, schedStep);
+    schedStep = (schedStep + 1) % curTrack.steps;
+    schedTime += stepDur;
+  }
+}
+
+function stopMusic(){
+  if(schedTimer) clearInterval(schedTimer);
+  schedTimer = null; curTrack = null; musicOn = false;
+}
+
+function toggleMusic(){
+  if(musicOn){
+    stopMusic();
+    $('soundBtn').textContent = '🔇';
+  } else {
+    startMusic(lastTrack);
+  }
+}
+
+// Музыка стартует с первого касания страницы (требование iOS Safari)
+function firstTap(){
+  document.body.removeEventListener('touchstart', firstTap);
+  document.body.removeEventListener('click', firstTap);
+  if(!musicOn) startMusic(lastTrack);
+}
+document.body.addEventListener('touchstart', firstTap, { passive:true });
+document.body.addEventListener('click', firstTap);
+
+document.addEventListener('visibilitychange', function(){
+  if(!document.hidden && musicOn && curTrack && !schedTimer){
+    schedTime = AC.currentTime + 0.1;
+    schedTimer = setInterval(schedulerTick, 60);
+  }
+});
+
+// ---------- Звуковые эффекты ----------
+let voicesReady = [], voicesLoaded = false;
+function loadVoices(){
+  if(!('speechSynthesis' in window)) return;
+  try {
+    voicesReady = speechSynthesis.getVoices();
+    if(voicesReady.length) voicesLoaded = true;
+  } catch(e){}
+}
+// На iOS Safari голоса приходят с задержкой — подписываемся на событие
+if('speechSynthesis' in window){
+  loadVoices();
+  speechSynthesis.onvoiceschanged = loadVoices;
+}
+
+function speak(text, rate, pitch, vol){
+  if(!('speechSynthesis' in window)) return;
+  try {
+    const u = new SpeechSynthesisUtterance(text);
+    const pool = voicesLoaded && voicesReady.length ? voicesReady : speechSynthesis.getVoices();
+    const en = pool.find(v => /en[-_]/i.test(v.lang)) || pool[0];
+    if(en) u.voice = en;
+    u.lang = en ? en.lang : 'en-US';
+    u.rate = rate || 1; u.pitch = pitch || 1; u.volume = vol || 1;
+    speechSynthesis.cancel();
+    speechSynthesis.speak(u);
+  } catch(e){}
+}
+
+function fx(name){
+  if(!AC) return;
+  const t = AC.currentTime;
+  switch(name){
+    case 'fight':
+      noiseHit(t, 0.35, 0.28, 250);
+      tone(t, 100, 0.35, 'sine', 0.5, 45, 0.01);
+      speak('Fight!', 1.15, 0.85, 1); break;
+    case 'yes':
+      speak('Yes!', 1.1, 1.3, 1);
+      tone(t, 523.25, 0.09, 'sine', 0.18);
+      tone(t + 0.08, 783.99, 0.15, 'sine', 0.18); break;
+    case 'no':
+      speak('No!', 1.0, 0.75, 1);
+      tone(t, 311.13, 0.22, 'sawtooth', 0.12, 155, 0.01); break;
+    case 'ready':
+      speak('Ready', 0.9, 0.9, 1);
+      tone(t, 392, 0.2, 'triangle', 0.14);
+      tone(t + 0.22, 311.13, 0.35, 'triangle', 0.14, 233.08, 0.05); break;
+    case 'finished':
+      speak('Finished!', 1.0, 1.0, 1);
+      [523.25, 659.25, 783.99, 1046.5].forEach((f, i) =>
+        tone(t + 0.1 + i * 0.12, f, 0.25, 'square', 0.13)); break;
+    case 'master':
+      speak('Master!', 0.95, 1.0, 1);
+      [440, 554.37, 659.25].forEach(f => tone(t + 0.05, f, 0.5, 'sawtooth', 0.09, null, 0.02)); break;
+    case 'boom':
+      noiseHit(t, 0.7, 0.3, 100);
+      tone(t, 70, 0.8, 'sine', 0.4, 28, 0.01);
+      tone(t + 0.05, 140, 0.3, 'sawtooth', 0.15, 50, 0.01); break;
+  }
+}
+
+// ---------- Таймер ответа: 15 секунд ----------
+const QUIZ_TIME = 15000;
+
+let qTimerInt = null, qDeadline = 0;
+
+function startQuizTimer(item){
+  stopQuizTimer();
+  const box = $('qtimerBox');
+  if(!box) return;
+  box.style.display = 'block';
+  qDeadline = Date.now() + QUIZ_TIME;
+  $('qtimerBar').style.width = '100%';
+  $('qtimerBar').style.background = '#39ffb0';
+  $('qtimerSec').textContent = '15';
+  qTimerInt = setInterval(function(){
+    const left = qDeadline - Date.now();
+    if(left <= 0){ answer(false, item); return; }
+    const frac = left / QUIZ_TIME;
+    $('qtimerBar').style.width = (frac * 100) + '%';
+    $('qtimerBar').style.background = frac > 0.4 ? '#39ffb0' : '#ff4d6d';
+    $('qtimerSec').textContent = Math.ceil(left / 1000);
+  }, 100);
+}
+
+function stopQuizTimer(){
+  if(qTimerInt) clearInterval(qTimerInt);
+  qTimerInt = null;
+  const box = $('qtimerBox');
+  if(box) box.style.display = 'none';
+}
+
+// ---------- Интро: метеориты ----------
+const icv = $('introCanvas');
+const ictx = icv.getContext('2d');
+let meteors = [], introActive = true, animId = null;
+
+function resizeCanvas(){ icv.width = innerWidth; icv.height = innerHeight; }
+addEventListener('resize', resizeCanvas);
+addEventListener('orientationchange', resizeCanvas);
+resizeCanvas();
+
+const SIZES = [34, 14, 7];
+const MAX_GEN = 2;
+const MAX_METEORS = 36;
+
+function spawnMeteor(sym, gen, x, y, vx, vy){
+  if(meteors.length >= MAX_METEORS) return;
+  meteors.push({
+    sym, gen,
+    x: x !== undefined ? x : (sym === 'X' ? -40 : icv.width + 40),
+    y: y !== undefined ? y : icv.height * (0.1 + Math.random() * 0.8),
+    vx: vx !== undefined ? vx : (sym === 'X' ? 1 : -1) * (70 + Math.random() * 90),
+    vy: vy !== undefined ? vy : (Math.random() - 0.5) * 50,
+    size: SIZES[gen],
+    spin: Math.random() * Math.PI * 2
+  });
+}
+
+for(let i = 0; i < 4; i++) spawnMeteor('X', 0);
+for(let i = 0; i < 4; i++) spawnMeteor('O', 0);
+
+let lastSpawn = 0;
+function spawnWave(now){
+  if(now - lastSpawn > 2600){
+    lastSpawn = now;
+    spawnMeteor('X', 0);
+    spawnMeteor('O', 0);
+  }
+}
+
+function splitMeteor(m, other){
+  const dx = m.x - other.x, dy = m.y - other.y;
+  const d = Math.max(Math.hypot(dx, dy), 1);
+  const nx = dx / d, ny = dy / d;
+  const base = m.sym === 'X' ? 1 : -1;
+  for(const s of [1, -1]){
+    spawnMeteor(m.sym, m.gen + 1,
+      m.x + nx * SIZES[m.gen + 1] * 1.4 * s,
+      m.y + ny * SIZES[m.gen + 1] * 1.4 * s,
+      nx * (120 + Math.random() * 100) * s + base * 40,
+      ny * (120 + Math.random() * 100) * s + (Math.random() - 0.5) * 60);
+  }
+}
+
+function updateMeteors(dt){
+  for(let i = meteors.length - 1; i >= 0; i--){
+    const m = meteors[i];
+    m.x += m.vx * dt;
+    m.y += m.vy * dt;
+    m.spin += dt * 1.5;
+    if(m.x < -80 || m.x > icv.width + 80 || m.y < -80 || m.y > icv.height + 80){
+      meteors.splice(i, 1);
+    }
+  }
+  for(let i = 0; i < meteors.length; i++){
+    const a = meteors[i];
+    if(!a) continue;
+    for(let j = i + 1; j < meteors.length; j++){
+      const b = meteors[j];
+      if(!b || a.sym === b.sym) continue;
+      if(Math.hypot(a.x - b.x, a.y - b.y) < (a.size + b.size) * 0.9){
+        if(a.gen < MAX_GEN) splitMeteor(a, b);
+        if(b.gen < MAX_GEN) splitMeteor(b, a);
+        meteors.splice(Math.max(i, j), 1);
+        meteors.splice(Math.min(i, j), 1);
+        return;
+      }
+    }
+  }
+}
+
+function drawMeteor(m){
+  const c = m.sym === 'X' ? '#ff4d6d' : '#4dd2ff';
+  ictx.save();
+  ictx.translate(m.x, m.y);
+  ictx.rotate(m.spin);
+  ictx.shadowBlur = 16;
+  ictx.shadowColor = c;
+  ictx.strokeStyle = c;
+  ictx.lineWidth = Math.max(2, m.size / 4);
+  ictx.lineCap = 'round';
+  if(m.sym === 'X'){
+    const s = m.size * 0.8;
+    ictx.beginPath();
+    ictx.moveTo(-s, -s); ictx.lineTo(s, s);
+    ictx.moveTo(-s, s);  ictx.lineTo(s, -s);
+    ictx.stroke();
+  } else {
+    ictx.beginPath();
+    ictx.arc(0, 0, m.size * 0.8, 0, Math.PI * 2);
+    ictx.stroke();
+  }
+  ictx.restore();
+}
+
+function introLoop(ts){
+  if(!introActive) return;
+  if(!introLoop.last) introLoop.last = ts;
+  const dt = Math.min((ts - introLoop.last) / 1000, 0.05);
+  introLoop.last = ts;
+  spawnWave(ts);
+  updateMeteors(dt);
+  ictx.clearRect(0, 0, icv.width, icv.height);
+  meteors.forEach(drawMeteor);
+  animId = requestAnimationFrame(introLoop);
+}
+requestAnimationFrame(introLoop);
+
+// ---------- Firebase ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyCMtXaMKqoiMnSr7rkqTdCrdvSJtC4Rcf8",
+  authDomain: "xomqa-1b810.firebaseapp.com",
+  databaseURL: "https://xomqa-1b810-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "xomqa-1b810",
+  storageBucket: "xomqa-1b810.firebasestorage.app"
+};
+let db = null, online = false, myUid = null;
+(function loadFirebase(){
+  const sources = [
+    ['gstatic (Google)', 'https://www.gstatic.com/firebasejs/8.10.1/firebase.js'],
+    ['cdnjs (Cloudflare)', 'https://cdnjs.cloudflare.com/ajax/libs/firebase/8.10.1/firebase.js'],
+    ['unpkg', 'https://unpkg.com/firebase@8.10.1/firebase.js']
+  ];
+  function loadOne(url){
+    return new Promise(function(res, rej){
+      var s = document.createElement('script');
+      s.src = url; s.onload = res; s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+  function trySource(i){
+    if(i >= sources.length){
+      dbg('Firebase: ни один CDN не отвечает — проверьте интернет, антивирус или блокировщик рекламы');
+      return;
+    }
+    const name = sources[i][0];
+    dbg('Firebase: пробуем ' + name + '...');
+    loadOne(sources[i][1]).then(function(){
+      try {
+        firebase.initializeApp(firebaseConfig);
+        db = firebase.database();
+        online = true;
+        dbg('Firebase: библиотека загружена (' + name + ')');
+        dbg('Firebase: подключен (через ' + name + ')');
+        if(firebase.auth){
+          firebase.auth().signInAnonymously().then(function(cred){
+            myUid = cred.user.uid;
+            dbg('Firebase: анонимный вход выполнен — uid получен');
+            setTimeout(function(){ dbgSetCollapsed(true); statsCleanup(); }, 2000);
+          }).catch(function(e){
+            dbg('Firebase: вход не удался — ' + e.code +
+              (e.code === 'auth/operation-not-allowed' ? ' — включите Anonymous в консоли Firebase' : ''));
+          });
+        } else {
+          dbg('Firebase: модуль auth недоступен в этой сборке');
+        }
+      } catch(e) {
+        dbg('Firebase: ' + e.message);
+      }
+    }).catch(function(){ trySource(i + 1); });
+  }
+  if(firebaseConfig.apiKey && !firebaseConfig.apiKey.startsWith('ВАШ')) trySource(0);
+  else dbg('Firebase: не заполнены ключи в firebaseConfig');
+})();
+
+// ---------- База вопросов ----------
+const QUESTIONS = {
+  0: [
+    {q:"Сколько будет 7 × 8?",a:["54","56","58","64"],c:1},
+    {q:"Сколько минут в одном часе?",a:["50","100","60","30"],c:2},
+    {q:"Какая планета ближе всего к Солнцу?",a:["Венера","Марс","Меркурий","Земля"],c:2},
+    {q:"Сколько дней в феврале невисокосного года?",a:["28","29","30","31"],c:0},
+    {q:"Кто написал «Войну и мир»?",a:["Толстой","Достоевский","Чехов","Гоголь"],c:0},
+    {q:"Сколько сторон у квадрата?",a:["3","4","5","6"],c:1},
+    {q:"Самый большой океан?",a:["Атлантический","Индийский","Тихий","Северный Ледовитый"],c:2},
+    {q:"Сколько будет 12 + 15?",a:["25","27","26","28"],c:1},
+    {q:"Какого цвета средняя полоса на флаге России?",a:["Синяя","Белая","Красная","Зелёная"],c:0},
+    {q:"Сколько ног у паука?",a:["6","8","10","4"],c:1},
+    {q:"Столица России?",a:["Санкт-Петербург","Москва","Казань","Новосибирск"],c:1},
+    {q:"Сколько будет 100 − 37?",a:["63","73","67","62"],c:0},
+    {q:"Какой прибор показывает время?",a:["Термометр","Часы","Компас","Линейка"],c:1},
+    {q:"Что тяжелее: килограмм пуха или килограмм железа?",a:["Пух","Железо","Одинаково","Зависит от погоды"],c:2},
+    {q:"Сколько месяцев в году?",a:["10","11","12","13"],c:2}
+  ],
+  1: [
+    {q:"Сколько будет 15% от 200?",a:["20","25","30","35"],c:2},
+    {q:"Столица Австралии?",a:["Сидней","Канберра","Мельбурн","Перт"],c:1},
+    {q:"Чему равен квадратный корень из 144?",a:["12","14","11","16"],c:0},
+    {q:"Какой газ преобладает в атмосфере Земли?",a:["Кислород","Азот","Углекислый газ","Водород"],c:1},
+    {q:"Самая высокая гора в мире?",a:["Монблан","Эверест","Килиманджаро","Эльбрус"],c:1},
+    {q:"Сколько материков на Земле?",a:["5","6","7","8"],c:2},
+    {q:"Формула воды?",a:["CO₂","H₂O","O₂","NaCl"],c:1},
+    {q:"Кто открыл закон всемирного тяготения?",a:["Ньютон","Эйнштейн","Галилей","Архимед"],c:0},
+    {q:"Сколько будет −7 + 12?",a:["5","−5","19","4"],c:0},
+    {q:"Самая длинная река мира?",a:["Амазонка","Нил","Волга","Лена"],c:0},
+    {q:"Чему равно число Пи с точностью до двух знаков?",a:["3,41","3,14","3,12","3,15"],c:1},
+    {q:"Какое животное самое быстрое на суше?",a:["Лев","Гепард","Антилопа","Зебра"],c:1},
+    {q:"Сколько секунд в двух минутах?",a:["60","100","120","200"],c:2},
+    {q:"Какой язык программирования создал Гвидо ван Россум?",a:["Java","Python","C++","Go"],c:1},
+    {q:"В каком веке жил Пушкин?",a:["XVII","XVIII","XIX","XX"],c:2}
+  ],
+  2: [
+    {q:"Чему равна скорость света в вакууме?",a:["300 000 км/с","150 000 км/с","1 000 000 км/с","300 000 м/с"],c:0},
+    {q:"Формула серной кислоты?",a:["HCl","H₂SO₄","HNO₃","H₂CO₃"],c:1},
+    {q:"Теорема Пифагора звучит как...",a:["a²+b²=c²","a+b=c","a·b=c","a²−b²=c²"],c:0},
+    {q:"Кто сформулировал три закона движения тел?",a:["Ньютон","Кеплер","Максвелл","Бор"],c:0},
+    {q:"Сколько будет 2⁵?",a:["16","25","32","64"],c:2},
+    {q:"Что измеряет ватт?",a:["Силу тока","Мощность","Напряжение","Сопротивление"],c:1},
+    {q:"Самый твёрдый минерал?",a:["Кварц","Алмаз","Топаз","Корунд"],c:1},
+    {q:"Чему равен sin(90°)?",a:["0","1","0,5","−1"],c:1},
+    {q:"Кто автор периодической системы элементов?",a:["Ломоносов","Менделеев","Кюри","Бор"],c:1},
+    {q:"Дискриминант вычисляется как...",a:["b²−4ac","4ac−b²","2b−4ac","b²+4ac"],c:0},
+    {q:"Что такое ДНК?",a:["Белок","Носитель генетической информации","Гормон","Фермент"],c:1},
+    {q:"Единица измерения силы?",a:["Джоуль","Ньютон","Паскаль","Ватт"],c:1},
+    {q:"Сколько будет √81?",a:["8","9","11","7"],c:1},
+    {q:"Какой процесс фотосинтез?",a:["Поглощение кислорода","Преобразование света в энергию","Дыхание","Испарение воды"],c:1},
+    {q:"Чему равно ускорение свободного падения на Земле?",a:["8,9 м/с²","9,8 м/с²","10,8 м/с²","7,8 м/с²"],c:1}
+  ],
+  3: [
+    {q:"Самое большое животное на планете?",a:["Слон","Синий кит","Африканский жираф","Кашалот"],c:1},
+    {q:"Сколько камер сердца у рыбы?",a:["1","2","3","4"],c:1},
+    {q:"Какой орган перекачивает кровь?",a:["Печень","Сердце","Лёгкие","Почки"],c:1},
+    {q:"Растения выделяют при фотосинтезе...",a:["Азот","Кислород","Метан","Водород"],c:1},
+    {q:"Самая глубокая точка Мирового океана?",a:["Жёлоб Зондский","Марианская впадина","Тренч Пуэрто-Рико","Курило-Камчатский жёлоб"],c:1},
+    {q:"Сколько хромосом у человека?",a:["23","46","48","44"],c:1},
+    {q:"Какое животное может обходиться без воды дольше всех?",a:["Верблюд","Верблюжья колючка","Пингвин","Дельфин"],c:0},
+    {q:"Какая кровь течёт по венам?",a:["Только артериальная","Бедная кислородом (у большого круга)","Богатая кислородом","Нет разницы"],c:1},
+    {q:"Самый быстрый обитатель океана?",a:["Дельфин","Парусник","Тунец","Акула"],c:1},
+    {q:"Что означает слово «экосистема»?",a:["Система улиц","Единая система живого и неживого","Система водоёмов","Система питания"],c:1},
+    {q:"Самая маленькая птица в мире?",a:["Синица","Колибри","Воробей","Стриж"],c:1},
+    {q:"Какая птица не умеет летать?",a:["Пингвин","Сокол","Ласточка","Кукушка"],c:0},
+    {q:"Что такое биосфера?",a:["Атмосфера","Оболочка Земли, где есть жизнь","Литосфера","Гидросфера"],c:1},
+    {q:"Какое дерево называют «деревом жизни» у народов Севера?",a:["Берёза","Ель","Кедр","Дуб"],c:2},
+    {q:"Сколько этажей в среднем у пчелиных сот?",a:["6","8","5","4"],c:0}
+  ],
+  4: [
+    {q:"Что такое квант?",a:["Минимальная неделимая порция энергии","Крупная частица","Тип атома","Изотоп"],c:0},
+    {q:"Кто предложил принцип неопределённости?",a:["Шрёдингер","Гейзенберг","Бор","Планк"],c:1},
+    {q:"Что описывает уравнение Шрёдингера?",a:["Движение планет","Волновую функцию частицы","Падение тел","Электрический ток"],c:1},
+    {q:"Что такое квантовая запутанность?",a:["Соединение атомов","Связь частиц вне зависимости от расстояния","Смешение веществ","Радиоактивный распад"],c:1},
+    {q:"Постулат Планка: энергия излучается...",a:["Непрерывно","Порциями (квантами)","Только в темноте","Равномерно"],c:1},
+    {q:"Что такое суперпозиция?",a:["Одно состояние частицы","Частица находится во многих состояниях одновременно","Смешение двух жидкостей","Тепловое расширение"],c:1},
+    {q:"Частица света называется...",a:["Нейтрон","Фотон","Мюон","Кварк"],c:1},
+    {q:"Что такое кварк?",a:["Элементарная частица, из которых состоят протоны и нейтроны","Молекула","Тип атома","Форма волны"],c:0},
+    {q:"Что означает «кубит»?",a:["Единица длины","Квантовый бит","Единица массы","Тип частицы"],c:1},
+    {q:"Кто основал квантовую механику (один из создателей)?",a:["Дарвин","Планк","Менделеев","Фарадей"],c:1},
+    {q:"Что происходит при квантовом измерении?",a:["Волна усиливается","Суперпозиция «схлопывается» в одно состояние","Ничего","Частица исчезает"],c:1},
+    {q:"Туннельный эффект — это...",a:["Прохождение частицы через потенциальный барьер","Рытьё туннелей","Разогрев частицы","Отражение света"],c:0},
+    {q:"Что такое постоянная Планка?",a:["Скорость света","Минимальная константа в квантовой физике","Гравитационная постоянная","Заряд электрона"],c:1},
+    {q:"Квантовый компьютер использует...",a:["Только 0 и 1","Кубиты в суперпозиции","Аналоговые сигналы","Механические шестерни"],c:1},
+    {q:"Что такое спин?",a:["Собственный момент импульса частицы","Скорость частицы","Заряд частицы","Масса частицы"],c:0}
+  ]
+};
+
+// ---------- Режимы ----------
+const MODES = [
+  { name:"Лёгкий",     size:3, winLen:3, tries:3, bombs:0 },
+  { name:"Средний",    size:4, winLen:4, tries:4, bombs:0 },
+  { name:"Высокий",    size:5, winLen:4, tries:5, bombs:0 },
+  { name:"Всезнайка",  size:6, winLen:4, tries:6, bombs:4 },
+  { name:"Вундеркинг", size:7, winLen:6, tries:3, bombs:6 }
+];
+
+// ---------- Состояние ----------
+let S = null, code = null, pid = null, nickMode = null, roomRef = null;
+let popTimer = null;
+const symOf = p => p === 'p1' ? 'X' : 'O';
+const nickOf = p => (S && S.players && S.players[p]) ? S.players[p].nick : 'Игрок';
+const otherPid = p => p === 'p1' ? 'p2' : 'p1';
+
+function roomWrite(data){
+  if(online && db && code){ db.ref('rooms/' + code).update(data); }
+  else { S = Object.assign({}, S, data); render(); }
+}
+function roomWriteFull(data){
+  if(online && db && code){ db.ref('rooms/' + code).set(data); }
+  else { S = data; render(); }
+}
+
+// ---------- Автоматическая чистка мёртвых комнат ----------
+function cleanupOldRooms(){
+  if(!online || !db) return;
+  const now = Date.now();
+  const WEEK = 7 * 24 * 60 * 60 * 1000;       // брошенные: старше 7 дней
+  const CLOSED_LIFE = 2 * 60 * 60 * 1000;     // закрытые: старше 2 часов
+
+  db.ref('rooms')
+    .orderByChild('createdTs')
+    .endAt(now - WEEK)
+    .once('value')
+    .then(function(stale){
+      const jobs = [];
+      stale.forEach(function(child){
+        jobs.push(child.ref.remove());
+      });
+      return db.ref('rooms')
+        .orderByChild('createdTs')
+        .endAt(now - CLOSED_LIFE)
+        .once('value')
+        .then(function(closed){
+          closed.forEach(function(child){
+            const v = child.val();
+            if(v && v.closed) jobs.push(child.ref.remove());
+          });
+          return Promise.all(jobs);
+        });
+    })
+    .catch(function(err){
+      dbg('Чистка: ' + (err && err.message ? err.message : err));
+    });
+}
+
+// ---------- Всплывающее окно ----------
+function showPopup(icon, text, autoCloseMs){
+  $('popIcon').textContent = icon;
+  $('popText').textContent = text;
+  $('popBtns').innerHTML = '';
+  $('popup').style.display = 'flex';
+  if(popTimer) clearTimeout(popTimer);
+  if(autoCloseMs) popTimer = setTimeout(closePopup, autoCloseMs);
+}
+function closePopup(){
+  if(popTimer) clearTimeout(popTimer);
+  $('popBtns').innerHTML = '';
+  $('popup').style.display = 'none';
+}
+function showChoice(icon, text, buttons){
+  $('popIcon').textContent = icon;
+  $('popText').textContent = text;
+  const b = $('popBtns');
+  b.innerHTML = '';
+  buttons.forEach(x => {
+    const btn = document.createElement('button');
+    btn.className = 'answer';
+    btn.textContent = x.label;
+    onTap(btn, x.fn);
+    b.appendChild(btn);
+  });
+  if(popTimer) clearTimeout(popTimer);
+  $('popup').style.display = 'flex';
+}
+
+// ---------- Возврат в интро ----------
+function returnToIntro(){
+  closePopup();
+  stopQuizTimer();
+  if(roomRef){ roomRef.off(); roomRef = null; }
+  code = null; S = null; pid = null; nickMode = null;
+  introActive = true;
+  introLoop.last = 0;
+  icv.style.display = 'block';
+  $('bgfun').style.display = 'none';
+  requestAnimationFrame(introLoop);
+  $('introActions').appendChild($('soundBtn'));
+  if(musicOn) startMusic('intro'); else lastTrack = 'intro';
+  if(typeof hostLobbyActive !== 'undefined' && hostLobbyActive){
+    hideAll(); $('screenQueue').style.display = 'block'; renderQueue(); return;
+  }
+  if(typeof qgActive !== 'undefined' && qgActive){ hideAll(); $('screenQGuest').style.display = 'block'; return; }
+  if(typeof mmActive !== 'undefined' && mmActive){ hideAll(); $('screenMM').style.display = 'block'; return; }
+  hideAll();
+  $('screenIntro').style.display = 'block';
+}
+
+function closeCurrentRoom(){
+  if(online && db && code){
+    db.ref('rooms/' + code + '/closed').set(true).catch(function(){});
+    setTimeout(function(){
+      db.ref('rooms/' + code).remove().catch(function(){});
+    }, 60000);
+  }
+}
+
+function uiBackToStart(){
+  closeCurrentRoom();
+  returnToIntro();
+}
+
+function newGame(){
+  closeCurrentRoom();
+  returnToIntro();
+}
+
+function uiBackFromDuel(){
+  if(!S || S.phase !== 'duel') return;
+  if(online && pid !== 'p1') return;
+  if(online && db){
+    roomWrite({ phase:'mode', numbers:{}, first:null, duelHtml:null });
+  } else {
+    S.numbers = {}; S.first = null; S.duelHtml = null;
+    S.phase = 'mode';
+    render();
+  }
+}
+
+// ---------- Выход из игры ----------
+function uiExitGame(){
+  if(!S || S.phase !== 'game') return;
+  if(online && db){
+    roomWrite({ q:null, phase:'final', winner:otherPid(pid), reason:'exit', endTs:Date.now() });
+  } else {
+    showChoice('🚪', 'Кто выходит из игры?', [
+      { label: nickOf('p1') + ' (X)', fn: function(){ finishExit('p1'); } },
+      { label: nickOf('p2') + ' (O)', fn: function(){ finishExit('p2'); } }
+    ]);
+  }
+}
+function finishExit(who){
+  closePopup();
+  fx('ready');
+  roomWrite({ q:null, phase:'final', winner:otherPid(who), reason:'exit', endTs:Date.now() });
+}
+
+// ---------- Ссылка для Twitch-чата ----------
+function copyTwitchLink(){
+  const base = location.href.split(/[?#]/)[0];
+  const url = base + '?room=' + code;
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(url).then(
+      function(){ showPopup('📋', 'Ссылка скопирована!\nВставьте её в чат своего Twitch-канала.', 3000); },
+      function(){ window.prompt('Скопируйте ссылку вручную:', url); }
+    );
+  } else {
+    window.prompt('Скопируйте ссылку:', url);
+  }
+}
+
+// ---------- Взрыв ----------
+function triggerBomb(who){
+  const boom = $('boom');
+  boom.style.display = 'block';
+  boom.style.animation = 'none';
+  void boom.offsetWidth;
+  boom.style.animation = 'boomFlash .9s ease-out forwards';
+  document.body.classList.add('shake');
+  setTimeout(function(){ document.body.classList.remove('shake'); }, 550);
+  fx('boom');
+  setTimeout(function(){
+    showPopup('💥', 'Сработала ловушка! Будь внимателен!\n' +
+      nickOf(who) + ' наступил на бомбу — поражение!');
+    roomWrite({ q:null, phase:'final', winner:otherPid(who), reason:'bomb', endTs:Date.now() });
+  }, 700);
+}
+
+// ---------- Экраны ----------
+function uiEnter(){
+  introActive = false;
+  if(animId) cancelAnimationFrame(animId);
+  icv.style.display = 'none';
+  $('bgfun').style.display = 'block';
+  hideAll();
+  $('screenStart').style.display = 'block';
+  document.body.appendChild($('soundBtn'));
+  dbg('Экран «Начать» открыт');
+}
+
+function uiCreate(){
+  if(!online){
+    showPopup('⚠️', 'Онлайн-режим недоступен: не удалось подключиться к Firebase.\n\nПроверьте интернет и обновите страницу (Ctrl+F5).');
+    return;
+  }
+  nickMode = 'create';
+  pid = 'p1';
+  $('nickTitle').textContent = 'Создать игру';
+  $('codeJoinBox').style.display = 'none';
+  hideAll(); $('screenNick').style.display = 'block';
+}
+function uiJoin(){
+  if(!online){
+    showPopup('⚠️', 'Онлайн-режим недоступен: не удалось подключиться к Firebase.\n\nПроверьте интернет и обновите страницу (Ctrl+F5).');
+    return;
+  }
+  nickMode = 'join';
+  pid = 'p2';
+  $('nickTitle').textContent = 'Присоединиться к игре';
+  $('codeJoinBox').style.display = 'block';
+  hideAll(); $('screenNick').style.display = 'block';
+}
+function genCode(){
+  const abc = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
+  let c = '';
+  for(let i = 0; i < 4; i++) c += abc[Math.floor(Math.random() * abc.length)];
+  return c;
+}
+
+function confirmNick(){
+  const nick = $('nickInput').value.trim();
+  const err = $('nickErr');
+  if(nick) myNick = nick;
+  if(online && !myUid){
+    err.textContent = 'Соединяемся с базой — нажмите «Далее» ещё раз через секунду.';
+    return;
+  }
+
+  if(!nick){ err.textContent = 'Введите никнейм!'; return; }
+  if(nickMode === 'create'){
+    cleanupOldRooms();
+    // Защита от серийного создания комнат: не чаще раза в 10 секунд
+    let lastCreate = 0;
+    try { lastCreate = +(localStorage.getItem('xomqa_lastcreate') || 0); } catch(e){}
+    if(Date.now() - lastCreate < 10000){
+      err.textContent = 'Подождите пару секунд перед созданием новой комнаты.';
+      return;
+    }
+    try { localStorage.setItem('xomqa_lastcreate', String(Date.now())); } catch(e){}
+    code = genCode();
+    db.ref('rooms/' + code).set({
+      phase:'wait', players:{ p1:{ nick:nick, uid:myUid } }, createdTs: Date.now()
+    }).then(function(){
+      roomRef = db.ref('rooms/' + code);
+      roomRef.on('value', function(snap){
+        S = snap.val();
+        if(!S || S.closed){ returnToIntro(); return; }
+        render();
+      });
+      hideAll(); $('screenWait').style.display = 'block';
+      $('codeShow').textContent = code;
+      $('waitMsg').textContent = 'Ждём второго игрока...';
+    }).catch(function(e){
+      err.textContent = 'Ошибка соединения. Попробуйте ещё раз.';
+      dbg('Создание комнаты: ' + (e && e.message ? e.message : e));
+    });
+  } else {
+    code = $('joinCode').value.trim().toUpperCase();
+    if(code.length !== 4){ err.textContent = 'Код состоит из 4 символов!'; return; }
+    db.ref('rooms/' + code).once('value').then(function(snap){
+      const room = snap.val();
+      if(!room || room.closed){ err.textContent = 'Комната не найдена или уже закрыта.'; return; }
+      if(room.players && room.players.p2){ err.textContent = 'В комнате уже два игрока.'; return; }
+      db.ref('rooms/' + code + '/players/p2').set({ nick:nick, uid:myUid });
+      roomRef = db.ref('rooms/' + code);
+      roomRef.on('value', function(snap){
+        S = snap.val();
+        if(!S || S.closed){ returnToIntro(); return; }
+        render();
+      });
+    }).catch(function(e){
+      err.textContent = 'Ошибка соединения. Попробуйте ещё раз.';
+      dbg('Подключение: ' + (e && e.message ? e.message : e));
+    });
+  }
+}
+
+function render(){
+  if(!S) return;
+  hideAll();
+  $('final').style.display = 'none';
+
+  if(S.phase === 'wait' && S.players && S.players.p2){
+    if(online && db) db.ref('rooms/' + code + '/phase').set('mode');
+    else { S.phase = 'mode'; render(); }
+    return;
+  }
+
+  if(S.phase === 'wait'){
+    $('screenWait').style.display = 'block';
+    $('codeShow').textContent = code;
+    $('waitMsg').textContent = 'Ждём второго игрока...';
+  }
+  else if(S.phase === 'mode'){
+    $('screenMode').style.display = 'block';
+    $('modeWho').textContent = online
+      ? nickOf('p1') + ' (хост) выбирает режим игры'
+      : 'Выберите режим игры';
+  }
+  else if(S.phase === 'duel'){
+    maybeResolveDuel();
+    showDuel();
+  }
+  else if(S.phase === 'game' || S.phase === 'final'){
+    showGame();
+    if(S.phase === 'final') showFinal();
+  }
+}
+
+// ---------- Выбор режима ----------
+function pickMode(idx){
+  if(!S || S.phase !== 'mode') return;
+  if(online && pid !== 'p1') return;
+  const m = MODES[idx];
+  const total = m.size * m.size;
+
+  const bombs = [];
+  if(m.bombs > 0){
+    const pool = [];
+    for(let i = 0; i < total; i++) pool.push(i);
+    for(let n = 0; n < m.bombs; n++){
+      const k = Math.floor(Math.random() * pool.length);
+      bombs.push(pool[k]);
+      pool.splice(k, 1);
+    }
+  }
+
+  roomWrite({
+    mode: idx,
+    phase: 'duel',
+    aiNum: 1 + Math.floor(Math.random() * 50),
+    numbers: {},
+    first: null,
+    duelHtml: null,
+    board: Array(total).fill(""),
+    bombs: bombs,
+    tries: { p1:m.tries, p2:m.tries },
+    streak: { p1:0, p2:0 },
+    cur: null,
+    q: null,
+    usedQ: [],
+    startTs: null,
+    winCells: null,
+    lastMsg: ''
+  });
+}
+
+// ---------- Дуэль чисел ----------
+function showDuel(){
+  $('screenDuel').style.display = 'block';
+  $('duelBack').style.display = (online && pid !== 'p1') ? 'none' : 'block';
+  const nums = S.numbers || {};
+  if(S.first){
+    $('duelInputBox').style.display = 'none';
+    $('duelWait').textContent = '';
+    $('duelResult').innerHTML = S.duelHtml || '';
+    $('duelGo').style.display = (!online || pid === 'p1') ? 'inline-block' : 'none';
+    return;
+  }
+  let who = null;
+  if(online){ who = nums[pid] == null ? pid : null; }
+  else { who = nums.p1 == null ? 'p1' : (nums.p2 == null ? 'p2' : null); }
+
+  if(who){
+    $('duelInputBox').style.display = 'block';
+    $('duelWait').textContent = '';
+    $('duelResult').textContent = '';
+    $('duelGo').style.display = 'none';
+    $('duelPrompt').textContent = nickOf(who) + ', введите своё число от 1 до 50.';
+    $('duelNum').value = '';
+  } else {
+    $('duelInputBox').style.display = 'none';
+    $('duelWait').textContent = 'Ожидаем число второго игрока...';
+    $('duelResult').textContent = '';
+    $('duelGo').style.display = 'none';
+  }
+}
+
+function duelNumSubmit(){
+  const v = parseInt($('duelNum').value, 10);
+  if(isNaN(v) || v < 1 || v > 50){ $('duelErr').textContent = 'Число от 1 до 50!'; return; }
+  $('duelErr').textContent = '';
+  let who;
+  if(online){ who = pid; }
+  else { who = (S.numbers && S.numbers.p1 == null) ? 'p1' : 'p2'; }
+  if(online && db && code){
+    db.ref('rooms/' + code + '/numbers/' + who).set(v);
+  } else {
+    const nums = Object.assign({}, S.numbers || {});
+    nums[who] = v;
+    roomWrite({ numbers: nums });
+  }
+}
+
+function maybeResolveDuel(){
+  if(S.phase !== 'duel' || S.first || !S.numbers) return;
+  if(online && pid !== 'p1') return;
+  const nums = S.numbers;
+  if(nums.p1 == null || nums.p2 == null) return;
+  const ai = S.aiNum;
+  const d1 = Math.abs(nums.p1 - ai), d2 = Math.abs(nums.p2 - ai);
+  let first, extra = '';
+  if(d1 < d2) first = 'p1';
+  else if(d2 < d1) first = 'p2';
+  else { first = Math.random() < 0.5 ? 'p1' : 'p2'; extra = '<p>Дистанции равны — монетка решает!</p>'; }
+  const html =
+    '<p>ИИ загадал: <b>' + ai + '</b></p>' +
+    '<p><span class="p1">' + nickOf('p1') + '</span>: ' + nums.p1 + ' (дистанция ' + d1 + ')<br>' +
+    '<span class="p2">' + nickOf('p2') + '</span>: ' + nums.p2 + ' (дистанция ' + d2 + ')</p>' + extra +
+    '<p>Первым ходит <b>' + nickOf(first) + '</b> — крестиком ❌</p>' +
+    (MODES[S.mode].bombs > 0
+      ? '<p class="danger">На поле спрятано ' + MODES[S.mode].bombs + ' бомб — не наступите!</p>'
+      : '');
+  roomWrite({ first: first, duelHtml: html });
+}
+
+function startMatch(){
+  if(online && pid !== 'p1') return;
+  fx('fight');
+  startMusic('game');
+  roomWrite({ phase:'game', cur:S.first, q:null, lastMsg:'' });
+}
+
+// ---------- Игровой экран ----------
+function showGame(){
+  if(lastTrack !== 'game'){ if(musicOn) startMusic('game'); else lastTrack = 'game'; }
+  $('screenGame').style.display = 'block';
+  updateHUD();
+  buildBoard();
+  if(S.phase === 'final'){ $('quiz').style.display = 'none'; return; }
+  if(S.q){
+    const mine = online ? (S.q.owner === pid) : true;
+    if(mine) showQuiz();
+    else {
+      $('quiz').style.display = 'none';
+      $('status').textContent = nickOf(S.q.owner) + ' отвечает на вопрос...';
+    }
+  } else {
+    $('quiz').style.display = 'none';
+    $('status').textContent = online
+      ? (S.cur === pid ? 'Ваш ход — выберите клетку!' : 'Ход: ' + nickOf(S.cur))
+      : 'Ход: ' + nickOf(S.cur) + ' — выберите клетку.';
+  }
+}
+
+function updateHUD(){
+  $('hudNick1').textContent = nickOf('p1');
+  $('hudNick2').textContent = nickOf('p2');
+  const trSym = (S.mode === 3 || S.mode === 4) ? '❤' : '♦';
+  $('tries1').textContent = trSym.repeat(S.tries.p1) || '—';
+  $('tries2').textContent = trSym.repeat(S.tries.p2) || '—';
+  const st = S.streak || { p1:0, p2:0 };
+  $('streak1').textContent = st.p1;
+  $('streak2').textContent = st.p2;
+  $('flash').textContent = S.lastMsg || '';
+}
+
+// ---------- Поле ----------
+function buildBoard(){
+  const m = MODES[S.mode];
+  const cs = m.size <= 3 ? 100 : m.size === 4 ? 82 : m.size === 5 ? 68 : m.size === 6 ? 56 : 48;
+  const maxW = Math.min(innerWidth - 40, 560);
+  const cell = Math.min(cs, Math.floor((maxW - (m.size - 1) * 8 - 20) / m.size));
+  const b = $('board');
+  b.style.gridTemplateColumns = 'repeat(' + m.size + ', ' + cell + 'px)';
+  b.style.gridTemplateRows = 'repeat(' + m.size + ', ' + cell + 'px)';
+  b.style.fontSize = (cell * 0.55) + 'px';
+  b.innerHTML = '';
+  const isFinal = S.phase === 'final';
+  S.board.forEach(function(v, i){
+    const isBombHere = isFinal && S.bombs && S.bombs.indexOf(i) >= 0 && !v;
+    const cellEl = document.createElement('div');
+    cellEl.className = 'cell' + (v ? ' used' : '') +
+                     (S.winCells && S.winCells.indexOf(i) >= 0 ? ' win' : '');
+    cellEl.style.width = cell + 'px';
+    cellEl.style.height = cell + 'px';
+    const face = document.createElement('span');
+    face.className = 'cellface' + (v ? ' ' + v.toLowerCase() : '') + (isBombHere ? ' bomb' : '');
+    face.style.width = (cell - 6) + 'px';
+    face.style.height = (cell - 6) + 'px';
+    face.textContent = isBombHere ? '💣' : v;
+    cellEl.appendChild(face);
+    if(!v && !isFinal && !S.q) onTap(cellEl, function(){ pickCell(i); });
+    b.appendChild(cellEl);
+  });
+}
+
+function pickCell(i){
+  if(!S || S.phase !== 'game' || S.q) return;
+  if(online && S.cur !== pid) return;
+  if(S.bombs && S.bombs.indexOf(i) >= 0){ triggerBomb(S.cur); return; }
+  if(!S.board.some(function(v){ return v; })){
+    placeFigure(S.cur, i);
+    return;
+  }
+  const pool = QUESTIONS[S.mode];
+  const used = S.usedQ || [];
+  let qi;
+  do { qi = Math.floor(Math.random() * pool.length); }
+  while(used.indexOf(qi) >= 0 && used.length < pool.length);
+  roomWrite({
+    q: { cell:i, idx:qi, owner:S.cur },
+    usedQ: used.concat(qi),
+    lastMsg: ''
+  });
+}
+
+function showQuiz(){
+  const item = QUESTIONS[S.mode][S.q.idx];
+  $('question').textContent = item.q;
+  const box = $('answers');
+  box.innerHTML = '';
+  item.a.forEach(function(t, i){
+    const btn = document.createElement('button');
+    btn.className = 'answer';
+    btn.textContent = t;
+    onTap(btn, function(){ answer(i === item.c, item); });
+    box.appendChild(btn);
+  });
+  startQuizTimer(item);
+  $('quiz').style.display = 'block';
+  $('status').textContent = nickOf(S.q.owner) + ', ответьте правильно, чтобы поставить фигуру!';
+}
+
+function answer(ok, item){
+  stopQuizTimer();
+  if(!S || !S.q) return;
+  const cell = S.q.cell;
+  const owner = S.q.owner;
+  const upd = { q:null };
+  const t = { p1:S.tries.p1, p2:S.tries.p2 };
+  const st = { p1:(S.streak && S.streak.p1) || 0, p2:(S.streak && S.streak.p2) || 0 };
+  if(ok){
+    st[owner]++;
+    upd.streak = st;
+    if(!online || owner === pid) awardPoints(10 + 5 * (st[owner] - 1));
+    if(st[owner] % 3 === 0){
+      fx('master');
+      upd.lastMsg = nickOf(owner) + ' собирает серию x' + st[owner] + '! Master!';
+    } else {
+      fx('yes');
+      upd.lastMsg = nickOf(owner) + ' ответил верно! Серия: ' + st[owner];
+    }
+    showPopup('🎉', st[owner] % 3 === 0
+      ? 'СЕРИЯ x' + st[owner] + '!\nMaster!'
+      : 'Молодец! Верно! 🎉', 1600);
+    const nb = S.board.slice();
+    nb[cell] = symOf(owner);
+    upd.board = nb;
+    const win = winCells(nb, cell);
+    if(win){ upd.winCells = win; upd.phase = 'final'; upd.winner = owner; upd.endTs = Date.now(); }
+    else if(nb.every(function(v){ return v; })){ upd.phase = 'final'; upd.winner = null; upd.endTs = Date.now(); }
+    else { upd.cur = otherPid(owner); }
+    if(!S.startTs) upd.startTs = Date.now();
+  } else {
+    fx('no');
+    st[owner] = 0;
+    upd.streak = st;
+    const correct = item.a[item.c];
+    showPopup('❌', 'Не верно! Правильный ответ:\n' + correct, 2600);
+    t[owner]--;
+    upd.tries = t;
+    if(t[owner] <= 0){
+      fx('ready');
+      upd.phase = 'final';
+      upd.winner = otherPid(owner);
+      upd.reason = 'tries';
+      upd.endTs = Date.now();
+    } else {
+      upd.cur = otherPid(owner);
+      upd.lastMsg = nickOf(owner) + ' ошибся! Осталось попыток: ' + t[owner];
+    }
+  }
+  roomWrite(upd);
+}
+
+function placeFigure(who, i){
+  if(S.bombs && S.bombs.indexOf(i) >= 0){ triggerBomb(who); return; }
+  const nb = S.board.slice();
+  nb[i] = symOf(who);
+  const upd = { board:nb, q:null, lastMsg:'' };
+  const win = winCells(nb, i);
+  if(win){ upd.winCells = win; upd.phase = 'final'; upd.winner = who; upd.endTs = Date.now(); }
+  else if(nb.every(function(v){ return v; })){ upd.phase = 'final'; upd.winner = null; upd.endTs = Date.now(); }
+  else { upd.cur = otherPid(who); }
+  if(!S.startTs) upd.startTs = Date.now();
+  roomWrite(upd);
+}
+
+// ---------- Проверка победы ----------
+function winCells(b, pos){
+  const m = MODES[S.mode];
+  const s = m.size, k = m.winLen, p = b[pos];
+  if(!p) return null;
+  const r = Math.floor(pos / s), c = pos % s;
+  const dirs = [[0,1],[1,0],[1,1],[1,-1]];
+  for(let d = 0; d < dirs.length; d++){
+    const cells = [pos];
+    for(const sg of [1,-1]){
+      let rr = r + dirs[d][0]*sg, cc = c + dirs[d][1]*sg;
+      while(rr >= 0 && rr < s && cc >= 0 && cc < s && b[rr*s+cc] === p){
+        cells.push(rr*s+cc);
+        rr += dirs[d][0]*sg; cc += dirs[d][1]*sg;
+      }
+    }
+    if(cells.length >= k) return cells;
+  }
+  return null;
+}
+
+// ---------- Таймер партии ----------
+setInterval(function(){
+  if(!S || !S.startTs || S.phase !== 'game') return;
+  const el = Math.floor(((S.endTs || Date.now()) - S.startTs) / 1000);
+  const h = String(Math.floor(el / 3600)).padStart(2,'0');
+  const m = String(Math.floor((el % 3600) / 60)).padStart(2,'0');
+  const s = String(el % 60).padStart(2,'0');
+  $('timer').textContent = h + ':' + m + ':' + s;
+}, 500);
+
+// ---------- Финал ----------
+function showFinal(){
+  closePopup();
+  $('final').style.display = 'block';
+  if(S.winner === null){
+    $('finalText').textContent = 'Ничья! Поле заполнено.';
+  } else if(S.reason === 'bomb'){
+    $('finalText').textContent = '💥 Сработала ловушка — будь внимателен!\n' + nickOf(otherPid(S.winner)) + ' наступил на бомбу. Победа за ' + nickOf(S.winner) + '! 🎉';
+  } else if(S.reason === 'exit'){
+    $('finalText').textContent = '🚪 ' + nickOf(otherPid(S.winner)) + ' вышел из игры. Победа за ' + nickOf(S.winner) + '! 🎉';
+  } else if(S.reason === 'tries'){
+    $('finalText').textContent = 'Автопоражение: у ' + nickOf(otherPid(S.winner)) + ' исчерпаны попытки. Победа за ' + nickOf(S.winner) + '! 🎉';
+  } else {
+    $('finalText').textContent = 'Победил ' + nickOf(S.winner) + '! 🎉';
+    fx('finished');
+  }
+  let time = '00:00:00';
+  if(S.startTs){
+    const el = Math.floor(((S.endTs || Date.now()) - S.startTs) / 1000);
+    time = [Math.floor(el/3600), Math.floor((el%3600)/60), el%60]
+      .map(function(v){ return String(v).padStart(2,'0'); }).join(':');
+  }
+  $('finalTime').textContent = 'Время партии: ' + time;
+}
+
+// ---------- Пришёл по ссылке из Twitch-чата ----------
+(function(){
+  const p = new URLSearchParams(location.search);
+  const room = p.get('room');
+  if(room && room.length === 4){
+    nickMode = 'join';
+    pid = 'p2';
+    $('nickTitle').textContent = 'Присоединиться к игре';
+    $('codeJoinBox').style.display = 'block';
+    $('joinCode').value = room.toUpperCase();
+    introActive = false;
+    if(animId) cancelAnimationFrame(animId);
+    icv.style.display = 'none';
+    $('bgfun').style.display = 'block';
+    document.body.appendChild($('soundBtn'));
+    hideAll();
+    $('screenNick').style.display = 'block';
+  }
+})();
+
+// ---------- Условия использования при первом заходе ----------
+(function(){
+  const p = new URLSearchParams(location.search);
+  if(p.get('room') && p.get('room').length === 4) return;
+  let seen = false;
+  try { seen = !!localStorage.getItem('xomqa_terms'); } catch(e){}
+  if(!seen) $('termsPopup').style.display = 'flex';
+})();
+
+function acceptTerms(){
+  try { localStorage.setItem('xomqa_terms', '1'); } catch(e){}
+  $('termsPopup').style.display = 'none';
+}
+
+// ---------- Страховка видимости ----------
+setTimeout(function(){
+  document.querySelectorAll('.intro-btn, .intro-sub, .intro-decor, .intro-copy')
+    .forEach(function(el){ el.style.opacity = 1; });
+}, 2500);
+
+// ---------- Привязка кнопок ----------
+onTap($('btnNickNext'), confirmNick);
+onTap($('btnCopyLink'), copyTwitchLink);
+for(let i = 0; i < 5; i++) onTap($('modeBtn' + i), function(){ pickMode(i); });
+onTap($('btnDuelNum'), duelNumSubmit);
+onTap($('duelGo'), startMatch);
+onTap($('duelBack'), uiBackFromDuel);
+onTap($('btnExit'), uiExitGame);
+onTap($('dbgTab'), dbgToggle);
+onTap($('btnAcceptNext'), acceptNext);
+onTap($('btnQueueBack'), leaveQueueHost);
+onTap($('btnQgJoin'), qgJoin);
+onTap($('btnQgLeave'), qgLeave);
+onTap($('btnMmJoin'), mmJoin);
+onTap($('btnMmLeave'), mmLeave);
+
+
+// ============================================================
+// ---------- Очки, личные коды и лобби очереди ----------
+// ============================================================
+let myNick = '';
+let hostLobbyActive = false, qgActive = false, mmActive = false;
+let queueRef = null, queueData = null, qgRef = null, qgKey = null;
+let mmRef = null, mmKey = null;
+
+function esc(s){
+  return String(s).replace(/[&<>"']/g, function(c){
+    return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];
+  });
+}
+
+// ---------- Личный код игрока ----------
+function getPlayerCode(){
+  let c = null;
+  try { c = localStorage.getItem('xomqa_pcode'); } catch(e){}
+  if(!c){
+    const abc = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';
+    c = 'XK-';
+    for(let i = 0; i < 6; i++) c += abc[Math.floor(Math.random() * abc.length)];
+    try { localStorage.setItem('xomqa_pcode', c); } catch(e){}
+  }
+  return c;
+}
+function getLocalPts(){
+  try { return +(localStorage.getItem('xomqa_pts') || 0); } catch(e){ return 0; }
+}
+function showBadge(){
+  const b = $('scoreBadge');
+  if(!b) return;
+  b.innerHTML = '🎫 ' + esc(getPlayerCode()) + ' · ' + esc(myNick || 'игрок') +
+                ' · <b id="badgePts">' + getLocalPts() + '</b> очков';
+  b.style.display = 'block';
+}
+function bumpBadge(){
+  const e = $('badgePts');
+  if(e) e.textContent = getLocalPts();
+}
+
+// ---------- Начисление очков (вызывается у отвечающего) ----------
+function awardPoints(pts){
+  if(!pts) return;
+  try { localStorage.setItem('xomqa_pts', String(getLocalPts() + pts)); } catch(e){}
+  bumpBadge();
+  if(online && db && myUid){
+    const c = getPlayerCode();
+    db.ref('stats/' + c).once('value').then(function(snap){
+      const v = snap.val() || {};
+      db.ref('stats/' + c).set({
+        nick: myNick || '', points: (v.points || 0) + pts, ts: Date.now()
+      }).catch(function(){});
+    }).catch(function(){});
+  }
+}
+
+// ---------- Чистка статистики старше 7 дней ----------
+function statsCleanup(){
+  if(!online || !db) return;
+  const cutoff = Date.now() - 7 * 24 * 3600 * 1000;
+  db.ref('stats').orderByChild('ts').endAt(cutoff).once('value').then(function(snap){
+    snap.forEach(function(ch){ db.ref('stats/' + ch.key).remove().catch(function(){}); });
+  }).catch(function(){});
+}
+
+// ---------- Общая подписка на комнату ----------
+function attachRoom(c, p, waitMsg){
+  code = c; pid = p;
+  roomRef = db.ref('rooms/' + c);
+  roomRef.on('value', function(snap){
+    S = snap.val();
+    if(!S || S.closed){ returnToIntro(); return; }
+    render();
+  });
+  hideAll();
+  if(waitMsg){
+    $('screenWait').style.display = 'block';
+    $('codeShow').textContent = c;
+    $('waitMsg').textContent = waitMsg;
+  }
+}
+
+// ---------- ЛОББИ ВЕДУЩЕГО ----------
+function uiQueueHost(){
+  if(!online){
+    showPopup('⚠️', 'Онлайн-режим недоступен: не удалось подключиться к Firebase.\n\nПроверьте интернет и обновите страницу (Ctrl+F5).');
+    return;
+  }
+  hostLobbyActive = true;
+  let hn = '';
+  try { hn = localStorage.getItem('xomqa_hostnick') || ''; } catch(e){}
+  $('hostNick').value = hn;
+  hideAll(); $('screenQueue').style.display = 'block';
+  listenQueue();
+  dbg('Лобби ведущего открыто');
+}
+function listenQueue(){
+  if(queueRef) return;
+  queueRef = db.ref('queue');
+  queueRef.on('value', function(snap){
+    queueData = [];
+    snap.forEach(function(ch){
+      const v = ch.val();
+      if(v && v.nick && !v.room && Date.now() - (v.ts || 0) < 2 * 3600 * 1000){
+        queueData.push({ key:ch.key, nick:v.nick, uid:v.uid, ts:v.ts || 0 });
+      }
+    });
+    queueData.sort(function(a, b){ return a.ts - b.ts; });
+    renderQueue();
+  });
+}
+function renderQueue(){
+  const el = $('queueList');
+  if(!el) return;
+  if(!queueData || !queueData.length){
+    el.innerHTML = '<small>Пока никто не записался. Зрители открывают ссылку и жмут «🙋 Зритель — записаться к стримеру».</small>';
+    $('btnAcceptNext').style.display = 'none';
+    return;
+  }
+  let html = '';
+  queueData.forEach(function(e, i){ html += (i + 1) + '. <b>' + esc(e.nick) + '</b><br>'; });
+  el.innerHTML = html;
+  const btn = $('btnAcceptNext');
+  btn.style.display = 'inline-block';
+  btn.textContent = '✅ Принять «' + queueData[0].nick + '» и играть';
+}
+function acceptNext(){
+  if(!queueData || !queueData.length) return;
+  if(!myUid){ dbg('Очередь: uid ещё не получен'); return; }
+  const e = queueData[0];
+  const nick = $('hostNick').value.trim() || 'Стример';
+  try { localStorage.setItem('xomqa_hostnick', nick); } catch(err){}
+  code = genCode();
+  db.ref('rooms/' + code).set({
+    phase:'wait', players:{ p1:{ nick:nick, uid:myUid } }, createdTs: Date.now()
+  }).then(function(){
+    myNick = nick;
+    hostLobbyActive = false;
+    if(queueRef){ queueRef.off(); queueRef = null; }
+    db.ref('queue/' + e.key + '/room').set(code).catch(function(){});
+    attachRoom(code, 'p1', 'Зритель подключается...');
+    showBadge();
+  }).catch(function(err){
+    dbg('Очередь: создание комнаты — ' + err.message);
+  });
+}
+function leaveQueueHost(){
+  hostLobbyActive = false;
+  if(queueRef){ queueRef.off(); queueRef = null; }
+  returnToIntro();
+}
+
+// ---------- ЗРИТЕЛЬ К СТРИМЕРУ ----------
+function uiQueueGuest(){
+  if(!online){
+    showPopup('⚠️', 'Онлайн-режим недоступен: не удалось подключиться к Firebase.\n\nПроверьте интернет и обновите страницу (Ctrl+F5).');
+    return;
+  }
+  qgActive = true;
+  hideAll();
+  $('screenQGuest').style.display = 'block';
+  $('qgForm').style.display = 'block';
+  $('qgStatus').style.display = 'none';
+  $('qgErr').textContent = '';
+}
+function qgJoin(){
+  const nick = $('qgNick').value.trim();
+  if(!nick){ $('qgErr').textContent = 'Введите никнейм!'; return; }
+  if(!myUid){ $('qgErr').textContent = 'Соединяемся с базой — нажмите ещё раз через секунду.'; return; }
+  var now = Date.now();
+  if(window._qgCooldownUntil && now < window._qgCooldownUntil){
+    $('qgErr').textContent = 'Подождите ' + Math.ceil((window._qgCooldownUntil - now) / 1000) + ' с перед повторной записью.';
+    return;
+  }
+  $('qgErr').textContent = 'Проверяем очередь...';
+  db.ref('queue').once('value').then(function(snap){
+    var dup = false;
+    snap.forEach(function(ch){
+      var v = ch.val();
+      if(v && Date.now() - (v.ts || 0) < 2 * 60 * 60 * 1000 &&
+         (v.uid === myUid || String(v.nick || '').trim().toLowerCase() === nick.toLowerCase())) dup = true;
+    });
+    if(dup){ $('qgErr').textContent = 'Вы или этот ник уже в очереди — подождите вызова.'; return; }
+    $('qgErr').textContent = '';
+    myNick = nick;
+    const rec = { nick:nick, uid:myUid, ts:Date.now() };
+    return db.ref('queue').push(rec).then(function(r){
+    qgKey = r.key;
+    qgRef = db.ref('queue/' + qgKey);
+    qgRef.on('value', qgWatch);
+      $('qgForm').style.display = 'none';
+      $('qgStatus').style.display = 'block';
+      $('qgPlace').textContent = 'Вы записались! Ждём вызова от стримера...';
+      showBadge();
+      watchQueuePositions();
+    });
+  }).catch(function(err){ $('qgErr').textContent = 'Ошибка: ' + err.message; });
+}
+let qgPosRef = null;
+function watchQueuePositions(){
+  if(qgPosRef) qgPosRef.off();
+  qgPosRef = db.ref('queue');
+  qgPosRef.on('value', function(snap){
+    if(!qgActive) return;
+    const arr = [];
+    snap.forEach(function(ch){
+      const v = ch.val();
+      if(v && !v.room && Date.now() - (v.ts || 0) < 2 * 3600 * 1000) arr.push(v);
+    });
+    arr.sort(function(a, b){ return a.ts - b.ts; });
+    const idx = arr.findIndex(function(v){ return v.uid === myUid; });
+    if(idx >= 0) $('qgPlace').textContent = 'Ваше место в очереди: ' + (idx + 1) + ' из ' + arr.length;
+  });
+}
+function qgWatch(snap){
+  if(!qgActive) return;
+  const v = snap.val();
+  if(v && v.room){
+    const c = v.room;
+    qgActive = false;
+    if(qgRef){ qgRef.off(); qgRef = null; }
+    if(qgPosRef){ qgPosRef.off(); qgPosRef = null; }
+    db.ref('queue/' + qgKey).remove().catch(function(){});
+    attachRoom(c, 'p2', 'Стример принял вас! Подключение...');
+    showBadge();
+  }
+}
+function qgLeave(){
+  qgActive = false;
+  window._qgCooldownUntil = Date.now() + 5000;
+  if(qgKey) db.ref('queue/' + qgKey).remove().catch(function(){});
+  if(qgRef){ qgRef.off(); qgRef = null; }
+  if(qgPosRef){ qgPosRef.off(); qgPosRef = null; }
+  returnToIntro();
+}
+
+// ---------- МАТЧМЕЙКИНГ БЕЗ СТРИМЕРА ----------
+function uiMatchmake(){
+  if(!online){
+    showPopup('⚠️', 'Онлайн-режим недоступен: не удалось подключиться к Firebase.\n\nПроверьте интернет и обновите страницу (Ctrl+F5).');
+    return;
+  }
+  mmActive = false;
+  hideAll();
+  $('screenMM').style.display = 'block';
+  $('mmForm').style.display = 'block';
+  $('mmStatus').style.display = 'none';
+  $('mmErr').textContent = '';
+}
+function mmJoin(){
+  const nick = $('mmNick').value.trim();
+  if(!nick){ $('mmErr').textContent = 'Введите никнейм!'; return; }
+  if(!myUid){ $('mmErr').textContent = 'Соединяемся с базой — нажмите ещё раз через секунду.'; return; }
+  var now = Date.now();
+  if(window._mmCooldownUntil && now < window._mmCooldownUntil){
+    $('mmErr').textContent = 'Подождите ' + Math.ceil((window._mmCooldownUntil - now) / 1000) + ' с перед повторным поиском.';
+    return;
+  }
+  $('mmErr').textContent = 'Проверяем очередь поиска...';
+  db.ref('mm').once('value').then(function(snap){
+    var dup = false;
+    snap.forEach(function(ch){
+      var v = ch.val();
+      if(v && Date.now() - (v.ts || 0) < 10 * 60 * 1000 &&
+         (v.uid === myUid || String(v.nick || '').trim().toLowerCase() === nick.toLowerCase())) dup = true;
+    });
+    if(dup){ $('mmErr').textContent = 'Вы или этот ник уже в поиске — подождите.'; return; }
+    $('mmErr').textContent = '';
+    myNick = nick;
+    mmActive = true;
+    $('mmForm').style.display = 'none';
+    $('mmStatus').style.display = 'block';
+    $('mmPlace').textContent = 'Ищем соперника...';
+    return db.ref('mm').push({ nick:nick, uid:myUid, ts:Date.now() }).then(function(r){
+      mmKey = r.key;
+      mmRef = db.ref('mm');
+      mmRef.on('value', mmWatch);
+      showBadge();
+    });
+  }).catch(function(err){ $('mmErr').textContent = 'Ошибка: ' + err.message; mmActive = false; $('mmForm').style.display = 'block'; $('mmStatus').style.display = 'none'; });
+}
+function mmWatch(snap){
+  if(!mmActive || !mmKey) return;
+  const list = [];
+  snap.forEach(function(ch){
+    const v = ch.val();
+    if(v && Date.now() - (v.ts || 0) < 10 * 60 * 1000){
+      list.push({ key:ch.key, nick:v.nick, uid:v.uid, ts:v.ts || 0, room:v.room || null });
+    }
+  });
+  list.sort(function(a, b){ return a.ts - b.ts; });
+  const mine = list.find(function(e){ return e.uid === myUid; });
+  if(!mine) return;
+  // Меня позвали в комнату — подключаюсь как гость
+  if(mine.room){
+    const c = mine.room;
+    mmActive = false;
+    if(mmRef){ mmRef.off(); mmRef = null; }
+    db.ref('mm/' + mine.key).remove().catch(function(){});
+    list.forEach(function(e){ if(e.room === c && e.uid !== myUid) db.ref('mm/' + e.key).remove().catch(function(){}); });
+    attachRoom(c, 'p2', 'Соперник найден! Подключение...');
+    return;
+  }
+  // Я первый в очереди и есть второй игрок — создаю комнату
+  if(list[0] && list[0].uid === myUid && list.length >= 2){
+    const other = list[1];
+    const c = genCode();
+    mmActive = false;
+    if(mmRef){ mmRef.off(); mmRef = null; }
+    db.ref('rooms/' + c).set({
+      phase:'wait', players:{ p1:{ nick:myNick, uid:myUid } }, createdTs: Date.now()
+    }).then(function(){
+      db.ref('mm/' + other.key + '/room').set(c).catch(function(){});
+      db.ref('mm/' + mine.key).remove().catch(function(){});
+      attachRoom(c, 'p1', 'Соперник найден: ' + other.nick + '. Ожидание...');
+    }).catch(function(err){ dbg('ММ: создание комнаты — ' + err.message); });
+  } else {
+    $('mmPlace').textContent = 'Ищем соперника... (в поиске: ' + list.length + ')';
+  }
+}
+function mmLeave(){
+  mmActive = false;
+  window._mmCooldownUntil = Date.now() + 5000;
+  if(mmKey) db.ref('mm/' + mmKey).remove().catch(function(){});
+  if(mmRef){ mmRef.off(); mmRef = null; }
+  returnToIntro();
+}
+
+// ---------- Показ плашки при любом входе в игру ----------
+if(online) showBadge();
+try { myNick = myNick || localStorage.getItem('xomqa_lastnick') || ''; } catch(e){}
+if(myNick) showBadge();
+
+dbg('Игра загружена. Кнопки активны.');
+</script>
+</body>
+</html>
