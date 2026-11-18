@@ -1096,9 +1096,10 @@ function returnToIntro(){
 
 function closeCurrentRoom(){
   if(online && db && code){
-    db.ref('rooms/' + code + '/closed').set(true).catch(function(){});
+    var oldCode = code; // фиксируем код комнаты: таймер удаляет именно СВОЮ комнату, а не текущую
+    db.ref('rooms/' + oldCode + '/closed').set(true).catch(function(){});
     setTimeout(function(){
-      db.ref('rooms/' + code).remove().catch(function(){});
+      db.ref('rooms/' + oldCode).remove().catch(function(){});
     }, 60000);
   }
 }
@@ -1242,7 +1243,17 @@ function confirmNick(){
       roomRef = db.ref('rooms/' + code);
       roomRef.on('value', function(snap){
         S = snap.val();
-        if(!S || S.closed){ returnToIntro(); return; }
+        if(S && S.closed){ returnToIntro(); return; }
+        if(!S){
+          var rc = code;
+          setTimeout(function(){
+            if(code !== rc || !roomRef){ return; }
+            db.ref('rooms/' + rc).once('value').then(function(rr){
+              if(!rr.val() || rr.val().closed){ returnToIntro(); }
+            }).catch(function(){ returnToIntro(); });
+          }, 3000);
+          return;
+        }
         render();
       });
       hideAll(); $('screenWait').style.display = 'block';
@@ -1263,7 +1274,17 @@ function confirmNick(){
       roomRef = db.ref('rooms/' + code);
       roomRef.on('value', function(snap){
         S = snap.val();
-        if(!S || S.closed){ returnToIntro(); return; }
+        if(S && S.closed){ returnToIntro(); return; }
+        if(!S){
+          var rc = code;
+          setTimeout(function(){
+            if(code !== rc || !roomRef){ return; }
+            db.ref('rooms/' + rc).once('value').then(function(rr){
+              if(!rr.val() || rr.val().closed){ returnToIntro(); }
+            }).catch(function(){ returnToIntro(); });
+          }, 3000);
+          return;
+        }
         render();
       });
     }).catch(function(e){
@@ -1780,7 +1801,16 @@ function attachRoom(c, p, waitMsg){
   roomRef = db.ref('rooms/' + c);
   roomRef.on('value', function(snap){
     S = snap.val();
-    if(!S || S.closed){ returnToIntro(); return; }
+    if(S && S.closed){ returnToIntro(); return; }
+    if(!S){
+      setTimeout(function(){
+        if(code !== c){ return; }
+        db.ref('rooms/' + c).once('value').then(function(rr){
+          if(!rr.val() || rr.val().closed){ returnToIntro(); }
+        }).catch(function(){ returnToIntro(); });
+      }, 3000);
+      return;
+    }
     render();
   });
   hideAll();
