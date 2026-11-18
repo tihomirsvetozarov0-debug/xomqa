@@ -197,39 +197,37 @@
             width:min(90%, 420px); background:rgba(255,255,255,.06); border-radius:10px;
             padding:10px 14px; font-size:15px; line-height:1.7; }
 
-  /* ---------- Панель боя ---------- */
-  #battleBtn { position:fixed; bottom:44px; right:8px; z-index:10001; background:rgba(0,0,0,.7); color:#a970ff;
-               font-size:11px; padding:6px 10px; border:1px solid #a970ff; border-radius:8px; cursor:pointer; }
-  #battlePanel { position:fixed; bottom:76px; right:8px; z-index:10001; width:280px; max-width:calc(100vw - 16px);
-                 background:rgba(10,6,20,.92); border:2px solid #a970ff; border-radius:12px; padding:10px 12px;
-                 font-size:13px; color:#fff; }
-  #battlePanel .bpTitle { font-size:12px; color:#b9a5e0; margin-bottom:6px; }
-  #battlePanel .bpRow { display:flex; gap:6px; align-items:center; margin:3px 0; flex-wrap:wrap; }
-  .bpX { color:#ff4d6d; font-weight:bold; } .bpO { color:#4dd2ff; font-weight:bold; }
-  .bpMeta { color:#b9a5e0; font-size:11px; } .bpTurn { color:#39ffb0; font-size:11px; font-weight:bold; }
-  .bpBoard { display:grid; gap:2px; margin:8px auto 4px; width:max-content; }
-  .bpCell { width:22px; height:22px; border-radius:4px; background:#2d1b4e; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:bold; }
-  .bpCell.win { background:linear-gradient(135deg,#a970ff,#ff8fd0); }
-  .bpBomb { font-size:11px; }
-  #battlePanel .bpStatus { margin-top:6px; font-size:13px; }
-  #battlePanel .bpMsg { margin-top:4px; font-size:11px; color:#39ffb0; min-height:14px; }
-  #battlePanel .bpDuel { margin-top:4px; font-size:11px; color:#b9a5e0; }
-
-  /* ---------- Оверлей для OBS / Twitch ---------- */
-  body.ovl-mode { background:transparent !important; overflow:hidden; }
-  body.ovl-mode #introCanvas, body.ovl-mode #bgfun, body.ovl-mode #dbgBox, body.ovl-mode #dbgTab,
-  body.ovl-mode #popup, body.ovl-mode #termsPopup, body.ovl-mode #battleBtn, body.ovl-mode #battlePanel,
-  body.ovl-mode #scoreBadge { display:none !important; }
-  #ovl { position:fixed; top:12px; left:50%; transform:translateX(-50%); z-index:6000; pointer-events:none;
-         display:none; flex-direction:column; align-items:center; gap:8px; width:min(92vw, 560px); }
-  #ovl.on { display:flex; }
-  .ovl-card { background:rgba(10,6,20,.78); border:2px solid #a970ff; border-radius:14px; padding:10px 18px;
-              color:#fff; font-size:16px; text-align:center; box-shadow:0 0 18px rgba(169,112,255,.35); }
-  #ovlLast { font-size:13px; }
-  .ovlx { color:#ff4d6d; } .ovlo { color:#4dd2ff; }
-  .ovl-dim { color:#b9a5e0; }
-  .ovl-score { margin-top:4px; font-size:14px; }
-  .ovl-logo { color:#a970ff; font-weight:bold; letter-spacing:1px; margin-right:6px; }
+  /* --- Панель боя (⚔️) и оверлей OBS --- */
+  #battleBtn { position:fixed; bottom:14px; right:14px; z-index:9100;
+            padding:9px 16px; border-radius:16px; border:1px solid rgba(168,85,247,.65);
+            background:rgba(20,10,40,.85); color:#e9d5ff; font-size:13px; cursor:pointer; }
+  #battleBtn:hover { background:rgba(60,30,100,.9); }
+  #battleWrap { position:fixed; bottom:56px; right:14px; z-index:9100; width:min(330px,88vw);
+            background:rgba(14,7,28,.93); border:1px solid rgba(168,85,247,.55);
+            border-radius:14px; padding:10px 12px; color:#eee; font-size:13px;
+            line-height:1.55; display:none; box-shadow:0 8px 30px rgba(0,0,0,.5); }
+  #battleWrap h4 { margin:0 0 6px; font-size:13px; color:#c4b5fd; }
+  .bp-row { display:flex; justify-content:space-between; gap:6px; }
+  .bp-on { color:#fbbf24; font-weight:700; }
+  .bp-field { display:grid; gap:2px; margin:8px 0 4px; }
+  .bp-cell { width:18px; height:18px; border-radius:4px; background:rgba(255,255,255,.08);
+            text-align:center; font-size:11px; line-height:18px; color:#fff; }
+  .bp-x { color:#f87171; } .bp-o { color:#7dd3fc; } .bp-d { color:#c084fc; }
+  .bp-win { box-shadow:0 0 0 2px #fbbf24 inset; } .bp-bomb { color:#f472b6; }
+  .bp-mut { color:#9ca3af; }
+  .xk-ovmode > *:not(#xkov) { display:none !important; }
+  #xkov { position:fixed; inset:0; z-index:99999; display:none; padding:0;
+            font-family:'Segoe UI',Arial,sans-serif; color:#f1f5f9; pointer-events:none; }
+  #xkovLive { margin:14px auto 0; width:max-content; max-width:92vw; padding:10px 22px;
+            border-radius:18px; border:2px solid rgba(168,85,247,.75);
+            background:rgba(20,10,40,.82); font-size:20px; font-weight:600; text-align:center;
+            box-shadow:0 6px 24px rgba(0,0,0,.45); }
+  #xkovLast { margin:12px auto 0; width:max-content; max-width:92vw; padding:12px 26px;
+            border-radius:18px; background:rgba(10,5,22,.78); text-align:center;
+            font-size:18px; }
+  #xkovLast b { color:#fbbf24; }
+  #xkovLast .xkov-win { font-size:24px; font-weight:700; color:#fde68a; }
+  #xkovScore { margin-top:6px; font-size:17px; color:#a5b4fc; }
 </style>
 </head>
 <body data-xk-build="XOMQA-build-2026-11-18-karatpulse">
@@ -352,6 +350,9 @@
   <div id="board"></div>
   <div id="flash"></div>
   <button class="exit-btn" id="btnExit">🚪 Выйти из игры</button>
+  <button class="battle-btn" id="battleBtn" style="display:none">⚔️ бой</button>
+  <div id="battleWrap"></div>
+
 
   <div id="quiz" class="box" style="display:none">
     <p id="question"></p>
@@ -872,17 +873,6 @@ function introLoop(ts){
 }
 requestAnimationFrame(introLoop);
 
-// ---------- Режим оверлея (OBS / Twitch) ----------
-var __OVL = null;
-(function(){
-  try{
-    const p = new URLSearchParams(location.search);
-    const ov = (p.get('overlay') || '').trim().toUpperCase();
-    if(ov === '' || ov === 'AUTO') __OVL = 'AUTO';
-    else if(/^[A-Z0-9]{4}$/.test(ov)) __OVL = ov;
-  }catch(e){}
-})();
-
 // ---------- Firebase ----------
 const firebaseConfig = {
   apiKey: "AIzaSyCMtXaMKqoiMnSr7rkqTdCrdvSJtC4Rcf8",
@@ -1141,23 +1131,12 @@ function returnToIntro(){
 
 function closeCurrentRoom(){
   if(online && db && code){
-    const oldCode = code; // фикс: таймер запоминает СВОЮ комнату
+    var oldCode = code; // фикс: запоминаем код СВОЕЙ комнаты — таймер не должен задеть новую игру
     db.ref('rooms/' + oldCode + '/closed').set(true).catch(function(){});
     setTimeout(function(){
       db.ref('rooms/' + oldCode).remove().catch(function(){});
     }, 60000);
   }
-}
-// Перепроверка комнаты при «моргании» сети — не выкидываем сразу
-function roomGoneCheck(c){
-  setTimeout(function(){
-    if(code !== c || !db) return;
-    db.ref('rooms/' + c).once('value').then(function(s){
-      const v = s.val();
-      if(!v || v.closed){ returnToIntro(); }
-      else { S = v; render(); }
-    }).catch(function(){});
-  }, 3000);
 }
 
 function uiBackToStart(){
@@ -1296,11 +1275,11 @@ function confirmNick(){
     db.ref('rooms/' + code).set({
       phase:'wait', players:{ p1:{ nick:nick, uid:myUid } }, createdTs: Date.now()
     }).then(function(){
-      ovlPoint(code);
-      roomRef = db.ref('rooms/' + code);
+      const justCode = code;
+      roomRef = db.ref('rooms/' + justCode);
       roomRef.on('value', function(snap){
         S = snap.val();
-        if(!S || S.closed){ roomGoneCheck(code); return; }
+        if(!S || S.closed){ roomGone(justCode); return; }
         render();
       });
       hideAll(); $('screenWait').style.display = 'block';
@@ -1318,10 +1297,11 @@ function confirmNick(){
       if(!room || room.closed){ err.textContent = 'Комната не найдена или уже закрыта.'; return; }
       if(room.players && room.players.p2){ err.textContent = 'В комнате уже два игрока.'; return; }
       db.ref('rooms/' + code + '/players/p2').set({ nick:nick, uid:myUid });
-      roomRef = db.ref('rooms/' + code);
+      const joinedCode = code;
+      roomRef = db.ref('rooms/' + joinedCode);
       roomRef.on('value', function(snap){
         S = snap.val();
-        if(!S || S.closed){ roomGoneCheck(code); return; }
+        if(!S || S.closed){ roomGone(joinedCode); return; }
         render();
       });
     }).catch(function(e){
@@ -1333,7 +1313,7 @@ function confirmNick(){
 
 function render(){
   if(!S) return;
-  try{ if(battleOn) battleRender(); }catch(e){}
+  try { renderBattlePanel(); } catch(e){}
   hideAll();
   $('final').style.display = 'none';
 
@@ -1724,7 +1704,6 @@ function showFinal(){
 (function(){
   const p = new URLSearchParams(location.search);
   if(p.get('room') && p.get('room').length === 4) return;
-  if(__OVL) return;
   let seen = false;
   try { seen = !!localStorage.getItem('xomqa_terms'); } catch(e){}
   if(!seen) $('termsPopup').style.display = 'flex';
@@ -1837,10 +1816,11 @@ function attachRoom(c, p, waitMsg){
   }
 
   code = c; pid = p;
+  try { if(db && p === 'p1') db.ref('overlay/last').set({ code:c, ts:Date.now() }).catch(function(){}); } catch(e){}
   roomRef = db.ref('rooms/' + c);
   roomRef.on('value', function(snap){
     S = snap.val();
-    if(!S || S.closed){ roomGoneCheck(code); return; }
+    if(!S || S.closed){ roomGone(c); return; }
     render();
   });
   hideAll();
@@ -1905,7 +1885,6 @@ function acceptNext(){
   db.ref('rooms/' + code).set({
     phase:'wait', players:{ p1:{ nick:nick, uid:myUid } }, createdTs: Date.now()
   }).then(function(){
-    ovlPoint(code);
     myNick = nick;
     hostLobbyActive = false;
     if(queueRef){ queueRef.off(); queueRef = null; }
@@ -2082,7 +2061,6 @@ function mmWatch(snap){
     db.ref('rooms/' + c).set({
       phase:'wait', players:{ p1:{ nick:myNick, uid:myUid } }, createdTs: Date.now()
     }).then(function(){
-      ovlPoint(c);
       db.ref('mm/' + other.key + '/room').set(c).catch(function(){});
       db.ref('mm/' + mine.key).remove().catch(function(){});
       attachRoom(c, 'p1', 'Соперник найден: ' + other.nick + '. Ожидание...');
@@ -2099,187 +2077,182 @@ function mmLeave(){
   returnToIntro();
 }
 
-
-// ---------- Панель боя ----------
-var battleOn = false;
-function battleInit(){
-  if(document.getElementById('battleBtn')) return;
-  const b = document.createElement('div');
-  b.id = 'battleBtn'; b.textContent = '⚔️ бой';
-  onTap(b, function(){ battleOn = !battleOn; battleRender(); });
-  document.body.appendChild(b);
-  const p = document.createElement('div');
-  p.id = 'battlePanel'; p.style.display = 'none';
-  document.body.appendChild(p);
-}
-function battleRender(){
-  const p = document.getElementById('battlePanel');
-  if(!p) return;
-  if(!battleOn || !S){ p.style.display = 'none'; return; }
-  p.style.display = 'block';
-  let html = '<div class="bpTitle">⚔️ Ход сражения · комната <b>' + esc(code || '') + '</b></div>';
-  const trSym = (S.mode === 3 || S.mode === 4) ? '\u2764' : '\u2666';
-  const st = S.streak || { p1:0, p2:0 };
-  const tr = S.tries || { p1:0, p2:0 };
-  ['p1','p2'].forEach(function(pp){
-    const cls = pp === 'p1' ? 'bpX' : 'bpO';
-    html += '<div class="bpRow"><span class="' + cls + '">' + esc(nickOf(pp)) + ' (' + symOf(pp) + ')</span>' +
-            '<span class="bpMeta">' + trSym.repeat(tr[pp] || 0) + ' · ' + (st[pp] || 0) + '\u{1F525}</span>' +
-            (S.phase === 'game' && S.cur === pp ? '<span class="bpTurn">\u25C0 ход</span>' : '') + '</div>';
-  });
-  const m = MODES[S.mode];
-  if(S.board && m){
-    html += '<div class="bpBoard" style="grid-template-columns:repeat(' + m.size + ', 22px)">';
-    for(let i = 0; i < S.board.length; i++){
-      const v = S.board[i];
-      let face = v ? (v === 'X' ? '\u2715' : '\u2B55') : '';
-      const cls = 'bpCell' + (v ? ' used' : '') + ((S.winCells && S.winCells.indexOf(i) >= 0) ? ' win' : '');
-      if(!v && S.phase === 'final' && S.bombs && S.bombs.indexOf(i) >= 0) face = '<span class="bpBomb">\u{1F4A3}</span>';
-      html += '<div class="' + cls + '">' + face + '</div>';
-    }
-    html += '</div>';
-  }
-  if(S.phase === 'duel'){
-    const nums = S.numbers || {};
-    const d1 = nums.p1 != null ? (S.first ? ('назвал ' + nums.p1) : 'назвал \u2713') : '\u2014';
-    const d2 = nums.p2 != null ? (S.first ? ('назвал ' + nums.p2) : 'назвал \u2713') : '\u2014';
-    html += '<div class="bpDuel">Дуэль чисел: ' + esc(nickOf('p1')) + ' \u2014 ' + d1 + ' · ' + esc(nickOf('p2')) + ' \u2014 ' + d2 + '</div>';
-  }
-  let txt = '';
-  if(S.phase === 'wait') txt = '\u23F3 Ждём второго игрока';
-  else if(S.phase === 'mode') txt = '\u{1F3AC} Выбор режима';
-  else if(S.phase === 'duel') txt = '\u{1F3B2} Дуэль чисел';
-  else if(S.phase === 'game') txt = '\u{1F3AE} Ход: ' + esc(nickOf(S.cur)) + ' (' + symOf(S.cur) + ')';
-  else if(S.phase === 'final') txt = S.winner
-    ? ('\u{1F3C6} Победа: ' + esc(nickOf(S.winner)) + ' (' + symOf(S.winner) + ')')
-    : '\u{1F91D} Ничья';
-  html += '<div class="bpStatus">' + txt + '</div>';
-  if(S.lastMsg) html += '<div class="bpMsg">' + esc(S.lastMsg) + '</div>';
-  p.innerHTML = html;
-}
-
-// ---------- Оверлей для OBS / Twitch ----------
-function ovlPoint(c){
-  if(online && db && c){
-    db.ref('overlay/last').set({ code:c, ts:Date.now() }).catch(function(){});
-  }
-}
-function ovlWaitDb(fn){
-  if(db){ fn(); return; }
-  setTimeout(function(){ ovlWaitDb(fn); }, 500);
-}
-function startOverlay(){
-  document.body.classList.add('ovl-mode');
-  try { $('introCanvas').style.display = 'none'; } catch(e){}
-  hideAll();
-  const root = document.createElement('div');
-  root.id = 'ovl';
-  root.innerHTML = '<div id="ovlNow" class="ovl-card"></div><div id="ovlLast" class="ovl-card"></div>';
-  document.body.appendChild(root);
-  root.classList.add('on');
-
-  let ovlRoom = null, ovlRef = null;
-  let st = null, countedEnd = null;
-
-  function stLoad(c){
-    try {
-      const v = JSON.parse(localStorage.getItem('xomqa_ovl_' + c) || 'null');
-      if(v && v.wins) return v;
-    } catch(e){}
-    return { wins:{ p1:0, p2:0 }, last:null, counted:null };
-  }
-  function stSave(){
-    try { localStorage.setItem('xomqa_ovl_' + ovlRoom, JSON.stringify(st)); } catch(e){}
-  }
-  function nn(R, p){
-    const pl = R && R.players;
-    return (pl && pl[p] && pl[p].nick) ? pl[p].nick : 'Игрок';
-  }
-  function reasonTxt(r){
-    if(r === 'bomb')  return '\u{1F4A5} соперник наступил на бомбу';
-    if(r === 'exit')  return '\u{1F6AA} соперник вышел из игры';
-    if(r === 'tries') return '\u23F3 у соперника исчерпаны попытки';
-    return '';
-  }
-  function scoreLine(){
-    const a = st.wins.p1 || 0, b2 = st.wins.p2 || 0;
-    return '<div class="ovl-score">Счёт: <b class="ovlx">X ' + a + '</b> : <b class="ovlo">' + b2 + ' O</b></div>';
-  }
-  function renderLast(){
-    const el = $('ovlLast');
-    if(!el) return;
-    if(!st || !st.last){
-      el.innerHTML = '<span class="ovl-dim">Прошлый раунд: пока не сыгран</span>' + scoreLine();
-      return;
-    }
-    const L = st.last;
-    const sym = L.winner === 'p1' ? 'X' : L.winner === 'p2' ? 'O' : '';
-    const head = L.winner
-      ? '\u{1F3C6} Победил <b class="' + (L.winner === 'p1' ? 'ovlx' : 'ovlo') + '">' + esc(L.nick) + '</b>' + (sym ? ' (' + sym + ')' : '')
-      : '\u{1F91D} Ничья';
-    const rs = reasonTxt(L.reason);
-    el.innerHTML = '<span class="ovl-dim">Прошлый раунд:</span> ' + head +
-      (rs ? ' <span class="ovl-dim">· ' + rs + '</span>' : '') + scoreLine();
-  }
-  function onRoom(R){
-    const nowEl = $('ovlNow');
-    if(!R || R.closed){
-      nowEl.innerHTML = '⏳ Ожидание комнаты ' + esc(ovlRoom || '') + '...';
-      if(st) renderLast();
-      return;
-    }
-    if(R.phase === 'final' && R.endTs && countedEnd !== R.endTs){
-      countedEnd = R.endTs;
-      if(R.winner) st.wins[R.winner] = (st.wins[R.winner] || 0) + 1;
-      st.last = { winner:R.winner || null, reason:R.reason || '', endTs:R.endTs,
-                  nick:R.winner ? nn(R, R.winner) : '' };
-      st.counted = R.endTs;
-      stSave();
-    }
-    let txt;
-    if(R.phase === 'wait')       txt = '⏳ Комната ' + esc(ovlRoom) + ' \u2014 ждём второго игрока';
-    else if(R.phase === 'mode')  txt = '\u{1F3AC} ' + esc(nn(R, 'p1')) + ' выбирает режим';
-    else if(R.phase === 'duel')  txt = '\u{1F3B2} Дуэль чисел: ' + esc(nn(R,'p1')) + ' vs ' + esc(nn(R,'p2'));
-    else if(R.phase === 'game')  txt = '\u{1F3AE} Ход: ' + esc(nn(R, R.cur)) + ' (' + (R.cur === 'p1' ? 'X' : 'O') + ')';
-    else if(R.phase === 'final') txt = R.winner
-      ? '\u{1F3C6} Победил ' + esc(nn(R, R.winner)) + ' (' + (R.winner === 'p1' ? 'X' : 'O') + ')!'
-      : '\u{1F91D} Ничья \u2014 поле заполнено';
-    else txt = 'XOMQA';
-    nowEl.innerHTML = '<span class="ovl-logo">XOMQA</span>' + txt;
-    renderLast();
-  }
-  function attach(c){
-    if(!db){ setTimeout(function(){ attach(c); }, 500); return; }
-    if(ovlRef){ ovlRef.off(); ovlRef = null; }
-    ovlRoom = c;
-    st = stLoad(c);
-    countedEnd = st.counted || null;
-    renderLast();
-    ovlRef = db.ref('rooms/' + c);
-    ovlRef.on('value', function(snap){ onRoom(snap.val()); });
-    $('ovlNow').innerHTML = '⏳ Подключение к комнате ' + esc(c) + '...';
-  }
-  if(__OVL === 'AUTO'){
-    ovlWaitDb(function(){
-      db.ref('overlay/last').on('value', function(snap){
-        const v = snap.val();
-        if(v && v.code && v.code !== ovlRoom) attach(v.code);
-      });
-    });
-    $('ovlNow').innerHTML = '⏳ Ожидание: запустите игру \u2014 оверлей подключится сам';
-  } else {
-    attach(__OVL);
-  }
-}
-
 // ---------- Показ плашки при любом входе в игру ----------
 if(online) showBadge();
 try { myNick = myNick || localStorage.getItem('xomqa_lastnick') || ''; } catch(e){}
 if(myNick) showBadge();
 
 dbg('Игра загружена. Кнопки активны.');
-if(!__OVL) battleInit();
-if(__OVL) startOverlay();
+
+
+// ---------- Панель боя «⚔️ бой» ----------
+function roomGone(c){
+  // Страховка от моргания сети: ждём 3 секунды и перепроверяем базу,
+  // прежде чем выбрасывать игрока на главный экран.
+  setTimeout(function(){
+    if(!online || !db) return;
+    db.ref('rooms/' + c).once('value').then(function(ss){
+      const s2 = ss.val();
+      if(!s2 || s2.closed) returnToIntro();
+    }).catch(function(){});
+  }, 3000);
+}
+function ovNickOf(S, p){
+  return (S.players && S.players[p] && S.players[p].nick) || (p === 'p1' ? 'Игрок X' : 'Игрок O');
+}
+function renderBattlePanel(){
+  const btn = $('battleBtn'), wrap = $('battleWrap');
+  if(!S || !code){ btn.style.display = 'none'; wrap.style.display = 'none'; return; }
+  btn.style.display = 'block';
+  if(wrap.style.display !== 'block') return;
+  const n1 = ovNickOf(S, 'p1'), n2 = ovNickOf(S, 'p2');
+  const trSym = (S.mode === 3 || S.mode === 4) ? '❤' : '♦';
+  const tr = S.tries || { p1:0, p2:0 };
+  const st = S.streak || { p1:0, p2:0 };
+  const cur = S.cur;
+  const on = function(p){ return cur === p ? ' class="bp-on"' : ''; };
+  const arrow = function(p){ return cur === p ? ' ◀ ход' : ''; };
+  let html = '<h4>⚔️ бой · комната ' + esc(code) + '</h4>';
+  html += '<div class="bp-row"><span' + (cur==='p1' ? ' class="bp-on"' : '') + '>❌ ' + esc(n1) + ' · ' + trSym.repeat(tr.p1 || 0) + ' · ' + (st.p1 || 0) + '🔥' + arrow('p1') + '</span></div>';
+  html += '<div class="bp-row"><span' + (cur==='p2' ? ' class="bp-on"' : '') + '>⭕ ' + esc(n2) + ' · ' + trSym.repeat(tr.p2 || 0) + ' · ' + (st.p2 || 0) + '🔥' + arrow('p2') + '</span></div>';
+  const m = MODES && MODES[S.mode];
+  if(m){
+    const len = (S.board || []).length;
+    const n = Math.round(Math.sqrt(len)) || m.size || 3;
+    const wins = S.winCells || [];
+    const bombs = S.bombs || [];
+    let cells = '';
+    for(let i = 0; i < len; i++){
+      const v = S.board[i] || '';
+      let cls = v === 'X' ? 'bp-x' : (v === 'O' ? 'bp-o' : (v === 'D' ? 'bp-d' : ''));
+      if(wins.indexOf(i) >= 0) cls += ' bp-win';
+      const mark = v === 'X' ? '✕' : (v === 'O' ? '◯' : (v === 'D' ? '◆' : (bombs.indexOf(i) >= 0 ? '💣' : '')));
+      cells += '<div class="bp-cell ' + cls + '">' + mark + '</div>';
+    }
+    html += '<div class="bp-field" style="grid-template-columns:repeat(' + n + ', 18px)">' + cells + '</div>';
+    if(S.phase === 'duel'){
+      const nu = S.numbers || {};
+      html += '<div class="bp-mut">Дуэль чисел: ' + esc(n1) + (nu.p1 !== undefined && nu.p1 !== null ? ' ✓' : ' …') + ' · ' + esc(n2) + (nu.p2 !== undefined && nu.p2 !== null ? ' ✓' : ' …') + '</div>';
+    } else if(S.phase === 'final'){
+      html += '<div class="bp-on">🏁 Раунд завершён</div>';
+    } else if(S.phase === 'play'){
+      html += '<div class="bp-mut">Ход: ' + esc(cur === 'p2' ? n2 : n1) + '</div>';
+    }
+    let t = '';
+    if(S.startTs){
+      const e = Math.floor(((S.endTs || Date.now()) - S.startTs) / 1000);
+      t = Math.floor(e / 3600) + ':' + String(Math.floor(e / 60) % 60).padStart(2, '0') + ':' + String(e % 60).padStart(2, '0');
+    }
+    if(S.lastMsg) html += '<div class="bp-mut">💬 ' + esc(S.lastMsg) + '</div>';
+    html += '<div class="bp-mut">⏱ ' + (t || '—') + '</div>';
+  }
+  wrap.innerHTML = html;
+}
+(function(){
+  const b = document.getElementById('battleBtn');
+  if(b) b.addEventListener('click', function(){
+    const w = document.getElementById('battleWrap');
+    if(w.style.display === 'block'){ w.style.display = 'none'; }
+    else { w.style.display = 'block'; try { renderBattlePanel(); } catch(e){} }
+  });
+})();
+
+// ---------- Оверлей для OBS ----------
+// Включается ТОЛЬКО если в адресе есть параметр ?overlay — обычная игра открывается как обычная игра.
+(function(){
+  let qs;
+  try { qs = new URLSearchParams(location.search); } catch(e){ return; }
+  if(!qs || !qs.has('overlay')) return;
+
+  window.XK_OVERLAY = true;
+  document.body.classList.add('xk-ovmode');
+  document.body.style.background = 'transparent';
+  document.documentElement.style.background = 'transparent';
+
+  const root = document.createElement('div');
+  root.id = 'xkov';
+  root.style.display = 'none';
+  root.innerHTML =
+    '<div id="xkovLive">⏳ Ожидание: запустите игру — оверлей подключится сам</div>' +
+    '<div id="xkovLast">Загрузка…</div>';
+  document.body.appendChild(root);
+
+  let ovLastEnd = null;
+  let ovPrev = null;
+  let ovRoomCode = ((qs.get('overlay') || '') + '').toUpperCase().replace(/[^A-Z0-9]/g, '');
+  let ovRef = null;
+  let score = { X:0, O:0 };
+  try {
+    if(qs.has('reset')) localStorage.removeItem('xkov_score');
+    score = JSON.parse(localStorage.getItem('xkov_score') || 'null') || { X:0, O:0 };
+  } catch(e){ score = { X:0, O:0 }; }
+  function saveScore(){ try { localStorage.setItem('xkov_score', JSON.stringify(score)); } catch(e){} }
+
+  const elLive = () => document.getElementById('xkovLive');
+  const elLast = () => document.getElementById('xkovLast');
+
+  function reasonText(r, loserNick){
+    if(r === 'bomb') return '💥 ловушка — ' + loserNick + ' наступил на бомбу';
+    if(r === 'exit') return '🚪 ' + loserNick + ' вышел из игры';
+    if(r === 'tries') return '⌛ у ' + loserNick + ' исчерпаны попытки';
+    return '';
+  }
+  function roundTitle(winnerPid, reason, S){
+    if(winnerPid === null) return '🤝 Ничья';
+    const nick = ovNickOf(S, winnerPid);
+    const sym = winnerPid === 'p1' ? 'X' : 'O';
+    const extra = reasonText(reason, ovNickOf(S, otherPid(winnerPid)));
+    return '🏆 Победил ' + nick + ' (' + sym + ')' + (extra ? ' — ' + extra : '');
+  }
+  function ovRender(S){
+    if(!S || !S.phase){ elLive().textContent = '⏳ Ожидание: запустите игру — оверлей подключится сам'; return; }
+    const n1 = ovNickOf(S, 'p1'), n2 = ovNickOf(S, 'p2');
+    let live = '';
+    if(S.phase === 'wait') live = '👀 Ждём второго игрока…';
+    else if(S.phase === 'mode') live = '🎮 Выбор режима · ' + n1 + ' (X) vs ' + n2 + ' (O)';
+    else if(S.phase === 'duel'){
+      const nu = S.numbers || {};
+      live = '🔢 Дуэль чисел · ' + n1 + (nu.p1 !== undefined && nu.p1 !== null ? ' ✓' : ' …') + ' · ' + n2 + (nu.p2 !== undefined && nu.p2 !== null ? ' ✓' : ' …');
+    } else if(S.phase === 'play') live = '⚔️ Ход: ' + (S.cur === 'p2' ? n2 + ' (O)' : n1 + ' (X)');
+    else if(S.phase === 'final') live = '🏁 Раунд завершён — ' + roundTitle(S.winner, S.reason, S);
+    elLive().textContent = live;
+
+    if(S.phase === 'final' && S.endTs && ovLastEnd !== S.endTs){
+      ovLastEnd = S.endTs;
+      if(S.winner !== null && S.winner !== undefined){
+        const sym = S.winner === 'p1' ? 'X' : 'O';
+        score[sym] = (score[sym] || 0) + 1;
+        saveScore();
+      }
+      ovPrev = { title: roundTitle(S.winner, S.reason, S) };
+    }
+    let lastHtml;
+    if(ovPrev){
+      lastHtml = '<div class="xkov-win">' + ovPrev.title + '</div>' +
+                 '<div id="xkovScore">Счёт: X ' + (score.X || 0) + ' : ' + (score.O || 0) + ' O</div>';
+    } else {
+      lastHtml = '<div class="bp-mut">Прошлый раунд: ещё не сыгран</div>' +
+                 '<div id="xkovScore">Счёт: X ' + (score.X || 0) + ' : ' + (score.O || 0) + ' O</div>';
+    }
+    elLast().innerHTML = lastHtml;
+  }
+  function ovListen(c){
+    if(ovRef) ovRef.off();
+    ovRef = db.ref('rooms/' + c);
+    ovRef.on('value', function(snap){ ovRender(snap.val()); });
+    elLive().textContent = '📡 Смотрю комнату ' + c;
+  }
+  function ovStart(){
+    if(!online || !db){ setTimeout(ovStart, 500); return; }
+    if(ovRoomCode){ ovListen(ovRoomCode); return; }
+    db.ref('overlay/last').on('value', function(snap){
+      const v = snap.val();
+      if(!v || !v.code) return;
+      if(ovRoomCode !== v.code){ ovRoomCode = v.code; ovListen(v.code); }
+    });
+  }
+  ovStart();
+})();
 
 /* XOMQA::canary-05::tail::xk-9d3f-a17c-71c3::XOMQA-build-2026-11-18-karatpulse */
 </script>
