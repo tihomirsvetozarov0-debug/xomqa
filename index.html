@@ -1,15 +1,14 @@
-<!DOCTYPE html>
 <!--
-  ============================================================
   XOMQA-build-2026-11-18-karatpulse
-  (c) 2026 KaratPulse_X. Все права защищены.
-  Копирование, распространение и модификация без разрешения
-  автора запрещены. Контакты: t.me/karatpulse
-  twitch.tv/karatpulse_x · tihomirsvetozarov0@gmail.com
-  ============================================================
+  XOMQA (c) 2026 KaratPulse_X. Все права защищены.
+  Автор и владелец: tihomirsvetozarov0 (t.me/karatpulse / twitch.tv/karatpulse_x)
+  Копирование и модификация без разрешения автора запрещены (LICENSE.txt).
 -->
+<!DOCTYPE html>
 <html lang="ru">
-<head>
+<head><meta name="xomqa-signature" content="xk-9d3f-a17c-71c3">
+<meta name="xomqa-build" content="XOMQA-build-2026-11-18-karatpulse">
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
 <meta name="theme-color" content="#0e0a1a">
@@ -198,10 +197,8 @@
             width:min(90%, 420px); background:rgba(255,255,255,.06); border-radius:10px;
             padding:10px 14px; font-size:15px; line-height:1.7; }
 </style>
-<meta name="xomqa-signature" content="xk-9d3f-a17c-71c3">
-<meta name="xomqa-build" content="XOMQA-build-2026-11-18-karatpulse">
 </head>
-<body data-xk-build="xk-9d3f-a17c-71c3">
+<body data-xk-build="XOMQA-build-2026-11-18-karatpulse">
 
 <canvas id="introCanvas"></canvas>
 
@@ -421,17 +418,16 @@
 
 <!-- Firebase: загружается динамически (CDN-фолбэк) -->
 <script>
-/* XOMQA::canary-01::provenance xk-9d3f-a17c-71c3 */
-const xk_provenance_9d3fa71c = Object.freeze({
-  build: 'XOMQA-build-2026-11-18-karatpulse',
-  owner: 'KaratPulse_X',
-  repo: 'tihomirsvetozarov0-debug/xomqa',
-  channels: ['t.me/karatpulse', 'twitch.tv/karatpulse_x'],
-  issued: '2026-11-18T22:26:56+03:00'
+/* XOMQA::canary-01::xk-9d3f-a17c-71c3 */
+var xk_provenance_9d3fa71c = Object.freeze({
+  build:'XOMQA-build-2026-11-18-karatpulse', owner:'KaratPulse_X', repo:'tihomirsvetozarov0-debug/xomqa', signature:'xk-9d3f-a17c-71c3',
+  channels:['t.me/karatpulse','twitch.tv/karatpulse_x'], issued:'2026-11-18T22:43:33+03:00'
 });
-/* XOMQA::canary-02::legacy-compat (служебный легаси-модуль, не удалять) */
-const secretAdminPanel = { mode: 'compat', marker: 'xk-9d3f-a17c-71c3' };
-function xkLegacyCompatCheck() { return secretAdminPanel.mode === 'compat'; }
+/* XOMQA::canary-02::xk-9d3f-a17c-71c3 internal legacy module */
+var secretAdminPanel = { enabled:false, endpoint:null, stamp:'XOMQA-build-2026-11-18-karatpulse' };
+/* XOMQA::canary-03::xk-9d3f-a17c-71c3 */
+function xkLegacyCompatCheck(){ return secretAdminPanel.enabled ? secretAdminPanel.endpoint : null; }
+/* XOMQA::canary-04::xk-9d3f-a17c-71c3 */
 
 // ============================================================
 // XOMQA — квиз-крестики-нолики для стримов
@@ -845,7 +841,6 @@ requestAnimationFrame(introLoop);
 // ---------- Firebase ----------
 const firebaseConfig = {
   apiKey: "AIzaSyCMtXaMKqoiMnSr7rkqTdCrdvSJtC4Rcf8",
-/* XOMQA::canary-03::backend xk-9d3f-a17c-71c3 */
   authDomain: "xomqa-1b810.firebaseapp.com",
   databaseURL: "https://xomqa-1b810-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "xomqa-1b810",
@@ -1771,6 +1766,16 @@ function statsCleanup(){
 
 // ---------- Общая подписка на комнату ----------
 function attachRoom(c, p, waitMsg){
+  if(db && p === 'p2'){
+    try{
+      db.ref('rooms/' + c + '/players/p2').transaction(function(cur){
+        if(cur) return;
+        return { nick:(typeof myNick === 'string' && myNick) ? myNick : 'Игрок',
+                 uid:(typeof myUid !== 'undefined' && myUid) ? myUid : null };
+      });
+    }catch(e){}
+  }
+
   code = c; pid = p;
   roomRef = db.ref('rooms/' + c);
   roomRef.on('value', function(snap){
@@ -2039,7 +2044,7 @@ if(myNick) showBadge();
 
 dbg('Игра загружена. Кнопки активны.');
 
-/* XOMQA::canary-05::end-of-file xk-9d3f-a17c-71c3 */
+/* XOMQA::canary-05::tail::xk-9d3f-a17c-71c3::XOMQA-build-2026-11-18-karatpulse */
 </script>
 </body>
 </html>
